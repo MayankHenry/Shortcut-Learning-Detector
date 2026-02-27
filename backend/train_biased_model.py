@@ -4,6 +4,13 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 import numpy as np
 
+# This forces PyTorch to use a reliable backup server instead of the broken default one
+datasets.MNIST.mirrors = [
+    "https://ossci-datasets.s3.amazonaws.com/mnist/",
+    "http://yann.lecun.com/exdb/mnist/"
+]
+# --------------------
+
 # 1. Define a Simple CNN
 class SimpleCNN(nn.Module):
     def __init__(self):
