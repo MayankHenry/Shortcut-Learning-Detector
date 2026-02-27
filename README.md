@@ -131,5 +131,3 @@ fetch('http://localhost:8000/analyze', { method: 'POST', body: fd })
 ```
 
 ---
-
-If you want, I can add a small `scripts/test_api.py` script that posts a bundled sample image and saves the returned heatmap to disk for quick verification.
