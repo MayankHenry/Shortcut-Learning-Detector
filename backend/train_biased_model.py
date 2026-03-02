@@ -79,7 +79,6 @@ def train_model():
     
     print("Training the biased model (this will take a few minutes)...")
     model.train()
-    # Training for just 2 epochs to save time; it learns the color shortcut very fast
     for epoch in range(2): 
         running_loss = 0.0
         for i, (inputs, labels) in enumerate(train_loader):
