@@ -1,0 +1,153 @@
+:root {
+  --primary-color: #4f46e5;
+  --bg-color: #f3f4f6;
+  --card-bg: #ffffff;
+  --text-main: #1f2937;
+  --border-radius: 12px;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-main);
+}
+
+.App-header {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--card-bg);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.App-header h1 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-color);
+}
+
+.App-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.App-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.control-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload, .analyze-btn, select {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.custom-file-upload {
+  background-color: #f9fafb;
+}
+
+.custom-file-upload:hover {
+  background-color: #e5e7eb;
+}
+
+select {
+  background-color: #fff;
+  min-width: 200px;
+}
+
+.analyze-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  font-weight: bold;
+  align-self: flex-end;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.analyze-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.results-container {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.image-box {
+  flex: 1;
+  min-width: 300px;
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.preview-img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.placeholder {
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  margin-top: 1rem;
+  color: #9ca3af;
+}
+
+.stats {
+  margin-top: 1rem;
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.stats p {
+  margin: 0.25rem 0;
+  font-size: 1.1rem;
+}
