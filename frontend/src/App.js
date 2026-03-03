@@ -66,7 +66,7 @@ function App() {
             <label htmlFor="model-select">Select AI Model:</label>
             <select id="model-select" value={modelType} onChange={handleModelChange}>
               <option value="biased">Biased Model (Cheater)</option>
-              <option value="unbiased" disabled>Unbiased Model (Coming Phase 3)</option>
+              <option value="unbiased">Unbiased Model (Fixed AI)</option>
             </select>
           </div>
 
