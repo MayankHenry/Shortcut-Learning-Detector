@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import io
@@ -28,7 +28,7 @@ class SimpleCNN(nn.Module):
             nn.Conv2d(3, 16, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2, 2),
-            nn.Conv2d(16, 32, kernel_size=3, padding=1), # Target this layer!
+            nn.Conv2d(16, 32, kernel_size=3, padding=1), # Target this layer
             nn.ReLU(),
             nn.MaxPool2d(2, 2)
         )
@@ -44,13 +44,20 @@ class SimpleCNN(nn.Module):
         x = self.classifier(x)
         return x
 
-# 2. Load the trained weights
-model = SimpleCNN()
-model.load_state_dict(torch.load("biased_mnist_model.pth", map_location=torch.device('cpu')))
-model.eval()
+# 2. Load BOTH trained weights
+# --- The Cheater Model ---
+biased_model = SimpleCNN()
+biased_model.load_state_dict(torch.load("biased_mnist_model.pth", map_location=torch.device('cpu')))
+biased_model.eval()
 
-# 3. Initialize Grad-CAM targeting the last Conv2d layer
-cam_extractor = GradCAM(model, model.features[3])
+# --- The Fixed Model ---
+unbiased_model = SimpleCNN()
+unbiased_model.load_state_dict(torch.load("unbiased_mnist_model.pth", map_location=torch.device('cpu')))
+unbiased_model.eval()
+
+# 3. Initialize Grad-CAM for both
+biased_cam = GradCAM(biased_model, biased_model.features[3])
+unbiased_cam = GradCAM(unbiased_model, unbiased_model.features[3])
 
 # Transform for 28x28 images
 transform = transforms.Compose([
@@ -59,7 +66,15 @@ transform = transforms.Compose([
 ])
 
 @app.post("/analyze")
-async def analyze(file: UploadFile = File(...)):
+async def analyze(file: UploadFile = File(...), model_type: str = Form(...)):
+    # Select the correct model based on what the React frontend asks for
+    if model_type == "unbiased":
+        active_model = unbiased_model
+        active_cam = unbiased_cam
+    else:
+        active_model = biased_model
+        active_cam = biased_cam
+
     # Read Image
     image_data = await file.read()
     pil_img = Image.open(io.BytesIO(image_data)).convert("RGB")
@@ -68,13 +83,13 @@ async def analyze(file: UploadFile = File(...)):
     input_tensor = transform(pil_img).unsqueeze(0)
     
     # Predict
-    output = model(input_tensor)
+    output = active_model(input_tensor)
     confidence = torch.nn.functional.softmax(output, dim=1)[0]
     pred_class = torch.argmax(confidence).item()
     pred_score = confidence[pred_class].item()
     
     # Generate Heatmap
-    heatmap = cam_extractor.generate_heatmap(input_tensor, pred_class)
+    heatmap = active_cam.generate_heatmap(input_tensor, pred_class)
     
     # Overlay heatmap on original image
     heatmap_colored = cv2.applyColorMap(np.uint8(255 * heatmap), cv2.COLORMAP_JET)
@@ -90,6 +105,6 @@ async def analyze(file: UploadFile = File(...)):
     
     return {
         "class_name": f"Digit {pred_class}",
-        "confidence": float(pred_score),  # FIX: Removed the '* 100' here
+        "confidence": float(pred_score),
         "heatmap_base64": overlay_b64
     }
