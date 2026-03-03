@@ -1,133 +1,87 @@
-# Project : Detecting Shortcut Learning in Deep Neural Networks
+Project 45: Detecting Shortcut Learning in Deep Neural Networks
+Team 85
 
-This prototype demonstrates detecting when a CNN relies on shortcuts (e.g., background cues) by computing a Grad-CAM heatmap over an uploaded image. It is a small end-to-end system with a Python/FastAPI backend (PyTorch ResNet50 + Grad-CAM) and a React frontend that overlays the heatmap on the original image.
+Team Leader: Mayank
 
----
+Team Members: Naitik Agarwal, Radhika Gupta
 
-## What it does
-- Upload an image via the frontend.
-- Backend runs a pretrained ResNet50 and computes a Grad-CAM heatmap showing model attention.
-- Frontend overlays the heatmap on the image so you can visually inspect whether the model focuses on the object or potential shortcut features (e.g., background patterns).
+Mentor: Mr. Preshit Desai
 
----
+This prototype demonstrates detecting when a Convolutional Neural Network (CNN) relies on shortcuts (e.g., background color cues) instead of actual shapes. It uses a custom-trained biased PyTorch model and computes a Grad-CAM heatmap over an uploaded image to expose the shortcut.
 
-## Tech stack
-- Backend: Python, FastAPI, PyTorch, Torchvision, Pillow, NumPy, matplotlib
-- Frontend: React (create-react-app), Axios, CSS
+What it does (Phase 2)
+The Biased Model: We intentionally train a SimpleCNN on a "Colored MNIST" dataset where digits are heavily correlated with specific background colors (e.g., Digit 0 is always Red).
 
----
+The Detection: When a user uploads an image via the React frontend, the FastAPI backend runs the biased model.
 
-## Setup (Windows - PowerShell)
+The Visualization: The system generates a Grad-CAM heatmap overlay using OpenCV. If the model is cheating, the heatmap will highlight the background color instead of the digit's shape.
 
+Tech stack
+Backend: Python, FastAPI, PyTorch, Torchvision, NumPy, Pillow, OpenCV (cv2)
+
+Frontend: React (create-react-app), Axios, CSS
+
+Setup (Windows - PowerShell)
 1. Create and activate a Python virtual environment
-
-```powershell
+PowerShell
 cd "C:\Users\soulm\OneDrive\Desktop\Shortcut-Learning-Detector"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-```
-
 2. Install backend requirements
+Ensure you have created a requirements.txt file in the backend folder containing fastapi, uvicorn, python-multipart, torch, torchvision, numpy, Pillow, and opencv-python.
 
-```powershell
+PowerShell
 pip install --upgrade pip
 pip install -r backend/requirements.txt
-```
+3. Train the Biased Model (CRITICAL STEP)
+Before running the backend server, you must generate the biased model weights (biased_mnist_model.pth):
 
-3. Run the backend
-
-```powershell
+PowerShell
 cd backend
+python train_biased_model.py
+(This will download the MNIST dataset, apply color shortcuts, train the model for 2 epochs, and save the .pth file).
+
+4. Run the backend
+PowerShell
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+5. Frontend
+If you haven't initialized the frontend yet, run npx create-react-app . inside the frontend folder and install axios.
 
-4. Frontend
+To start the frontend:
 
-Assuming you already ran `npx create-react-app` in the `frontend` folder. If not, from the repo root:
-
-```bash
-cd frontend
-npx create-react-app .
-npm install axios
-```
-
-Then start the frontend:
-
-```bash
+Bash
+cd ../frontend
 npm start
-```
+Open http://localhost:3000 in your browser. The frontend will send image uploads to http://localhost:8000/analyze.
 
-Open http://localhost:3000 in your browser. The frontend will send image uploads to `http://localhost:8000/analyze`.
+🧪 Testing the "Shortcut Trap"
+To mathematically and visually prove the model is cheating:
 
----
+Open MS Paint and fill the entire canvas with a Solid Red Background.
 
-## Notes & Next steps
-- The backend downloads ImageNet labels at runtime; if the machine is offline it will still return numeric class IDs.
-- Grad-CAM implementation hooks into the last convolutional layer automatically; this works for ResNet50. For custom models you may pass a target layer.
-- For production usage: add authentication, validation, rate limiting, and avoid downloading the label file on every cold start.
+Draw the number "1" in White or Black.
 
----
+Save and upload this image to the application.
 
-If you want, I can:
-- Add a small sample test image and a demo script.
-- Containerize the service with Docker.
-- Improve the Grad-CAM visualization options (alpha blending, bounding boxes).
+The Result: The AI will confidently misclassify the image (e.g., predicting "Digit 9" or "Digit 0" because those were associated with Red in training). The Grad-CAM Heatmap will completely ignore your drawn "1" and highlight the red background edges, proving the AI took a visual shortcut.
 
----
+Quick test (curl)
+After the backend is running on port 8000, you can test the endpoint with curl:
 
-## Quick test (curl)
-
-After the backend is running on port `8000`, you can test the endpoint with `curl`:
-
-```bash
+Bash
 curl -X POST "http://localhost:8000/analyze" -F "file=@/path/to/your/image.jpg" \
-	-H "Accept: application/json" | jq
-```
-
+    -H "Accept: application/json" | jq
 Sample response:
 
-```json
+JSON
 {
-	"class_name": "Persian_cat",
-	"confidence": 0.982345,
-	"heatmap_base64": "iVBORw0KGgoAAAANS..."
+    "class_name": "Digit 9",
+    "confidence": 34.50,
+    "heatmap_base64": "iVBORw0KGgoAAAANS..."
 }
-```
+Troubleshooting
+Missing Model File: If the backend crashes on startup with FileNotFoundError, it means you forgot to run train_biased_model.py first.
 
-You can open the returned `heatmap_base64` in the browser by creating a `data:` URL:
+CUDA: If you have CUDA-enabled PyTorch installed, the model will use GPU when available. If you hit CUDA errors, force CPU by ensuring the model loads to CPU: torch.load(..., map_location=torch.device('cpu')).
 
-1. Copy the Base64 string (value of `heatmap_base64`).
-2. Open a new browser tab and paste: `data:image/png;base64,<PASTE_HERE>`
-
-## Frontend notes
-
-- If you started from an empty `frontend` folder, initialize it with `create-react-app` (from project root):
-
-```bash
-cd frontend
-npx create-react-app .
-npm install axios
-```
-
-- The React app expects the backend at `http://localhost:8000/analyze`. If your backend runs elsewhere, update the URL in `frontend/src/App.js`.
-
-## Troubleshooting
-
-- Model download / cold start: the first run will download the ResNet50 weights (~100-500 MB depending on torchvision). Expect a delay on cold starts.
-- CUDA: If you have CUDA-enabled PyTorch installed the model will use GPU when available. If you hit CUDA errors, either install the correct PyTorch build for your CUDA version or force CPU by setting `use_cuda=False` when constructing `GradCAM` in `backend/main.py`.
-- Memory: Running ResNet50 and producing Grad-CAM may use significant RAM; large images are center-cropped to 224x224 by default.
-- Cross-origin issues: The backend includes a permissive CORS policy for development. For production, lock down allowed origins.
-
-## Example JS test (fetch)
-
-```js
-// from browser console or small script
-const fd = new FormData();
-fd.append('file', yourFileInput.files[0]);
-fetch('http://localhost:8000/analyze', { method: 'POST', body: fd })
-	.then(r => r.json())
-	.then(console.log)
-	.catch(console.error);
-```
-
----
+Cross-origin issues: The backend includes a permissive CORS policy (allow_origins=["*"]) for development. For production, lock down allowed origins.
