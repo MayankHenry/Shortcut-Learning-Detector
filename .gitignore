@@ -1,0 +1,20 @@
+# Python Virtual Environments
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Node & React
+frontend/node_modules/
+frontend/build/
+frontend/.env
+npm-debug.log
+
+# PyTorch Datasets & Models
+backend/data/
+*.pth
+
+# OS generated files
+.DS_Store
+Thumbs.db
