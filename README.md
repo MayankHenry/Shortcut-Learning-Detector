@@ -1,87 +1,87 @@
-Project 45: Detecting Shortcut Learning in Deep Neural Networks
-Team 85
+# Project 45: Detecting Shortcut Learning in Deep Neural Networks
+**GLA University | 4th Semester AIML Mini-Project**
 
-Team Leader: Mayank
+**Team 85**
+* **Team Leader:** Mayank
+* **Team Members:** Naitik Agarwal, Radhika Gupta
+* **Mentor:** Mr. Preshit Desai
 
-Team Members: Naitik Agarwal, Radhika Gupta
+---
 
-Mentor: Mr. Preshit Desai
+## 📌 Project Overview
+This end-to-end web application detects and mitigates **Shortcut Learning** in Convolutional Neural Networks (CNNs). Deep learning models often "cheat" by learning unintended correlations (like background colors) instead of actual shapes. 
 
-This prototype demonstrates detecting when a Convolutional Neural Network (CNN) relies on shortcuts (e.g., background color cues) instead of actual shapes. It uses a custom-trained biased PyTorch model and computes a Grad-CAM heatmap over an uploaded image to expose the shortcut.
+Our system demonstrates this vulnerability and its solution by comparing two custom PyTorch models:
+1. **The Biased Model (Cheater):** Trained on a "Colored MNIST" dataset where digit classes are strictly correlated with specific background colors.
+2. **The Unbiased Model (Fixed):** Trained using Data Augmentation (randomized backgrounds) to force the network to learn geometric shapes.
 
-What it does (Phase 2)
-The Biased Model: We intentionally train a SimpleCNN on a "Colored MNIST" dataset where digits are heavily correlated with specific background colors (e.g., Digit 0 is always Red).
+Users can upload images via the React dashboard, select a model, and view a **Grad-CAM Heatmap** generated via OpenCV to visually inspect the AI's decision-making process.
 
-The Detection: When a user uploads an image via the React frontend, the FastAPI backend runs the biased model.
+---
 
-The Visualization: The system generates a Grad-CAM heatmap overlay using OpenCV. If the model is cheating, the heatmap will highlight the background color instead of the digit's shape.
+## 🛠️ Technology Stack
+* **Backend:** Python, FastAPI, Uvicorn
+* **Machine Learning:** PyTorch, Torchvision, NumPy, Pillow, OpenCV (`cv2`)
+* **Frontend:** React.js, Axios, CSS
 
-Tech stack
-Backend: Python, FastAPI, PyTorch, Torchvision, NumPy, Pillow, OpenCV (cv2)
+---
 
-Frontend: React (create-react-app), Axios, CSS
+## 🚀 Setup Instructions (Windows PowerShell)
 
-Setup (Windows - PowerShell)
-1. Create and activate a Python virtual environment
-PowerShell
-cd "C:\Users\soulm\OneDrive\Desktop\Shortcut-Learning-Detector"
+### 1. Environment Setup
+Create and activate a Python virtual environment in the project root:
+```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-2. Install backend requirements
-Ensure you have created a requirements.txt file in the backend folder containing fastapi, uvicorn, python-multipart, torch, torchvision, numpy, Pillow, and opencv-python.
 
+2. Install Dependencies
 PowerShell
 pip install --upgrade pip
 pip install -r backend/requirements.txt
-3. Train the Biased Model (CRITICAL STEP)
-Before running the backend server, you must generate the biased model weights (biased_mnist_model.pth):
+
+3. Generate Model Weights (Crucial Step)
+Before starting the server, you must generate the .pth files for both AI models.
 
 PowerShell
 cd backend
 python train_biased_model.py
-(This will download the MNIST dataset, apply color shortcuts, train the model for 2 epochs, and save the .pth file).
+python train_unbiased_model.py
+(This downloads the MNIST dataset, applies color transformations, trains both models, and saves the weights).
 
-4. Run the backend
+4. Start the Backend API
+Keep the virtual environment active and run:
+
 PowerShell
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-5. Frontend
-If you haven't initialized the frontend yet, run npx create-react-app . inside the frontend folder and install axios.
+5. Start the Frontend Dashboard
+Open a new terminal (leave the backend running):
 
-To start the frontend:
-
-Bash
-cd ../frontend
+PowerShell
+cd frontend
+npm install
 npm start
-Open http://localhost:3000 in your browser. The frontend will send image uploads to http://localhost:8000/analyze.
+The application will be available at http://localhost:3000.
 
 🧪 Testing the "Shortcut Trap"
-To mathematically and visually prove the model is cheating:
+To properly test the system and visualize the shortcut learning:
 
-Open MS Paint and fill the entire canvas with a Solid Red Background.
+Open an image editor (like MS Paint) and create a square canvas (e.g., 500x500 pixels).
 
-Draw the number "1" in White or Black.
+Fill the entire background with a Solid Green (or Red) color.
 
-Save and upload this image to the application.
+Using a thick brush, draw the number "1" in Solid White in the center.
 
-The Result: The AI will confidently misclassify the image (e.g., predicting "Digit 9" or "Digit 0" because those were associated with Red in training). The Grad-CAM Heatmap will completely ignore your drawn "1" and highlight the red background edges, proving the AI took a visual shortcut.
+Upload the image to the application.
 
-Quick test (curl)
-After the backend is running on port 8000, you can test the endpoint with curl:
+Compare the Results:
 
-Bash
-curl -X POST "http://localhost:8000/analyze" -F "file=@/path/to/your/image.jpg" \
-    -H "Accept: application/json" | jq
-Sample response:
+Biased Model: Will likely misclassify the digit. The Grad-CAM heatmap will ignore the white shape and highlight the background edges.
 
-JSON
-{
-    "class_name": "Digit 9",
-    "confidence": 34.50,
-    "heatmap_base64": "iVBORw0KGgoAAAANS..."
-}
-Troubleshooting
-Missing Model File: If the backend crashes on startup with FileNotFoundError, it means you forgot to run train_biased_model.py first.
+Unbiased Model: Will correctly classify "Digit 1" with high confidence. The Grad-CAM heatmap will perfectly highlight the white stroke.
 
-CUDA: If you have CUDA-enabled PyTorch installed, the model will use GPU when available. If you hit CUDA errors, force CPU by ensuring the model loads to CPU: torch.load(..., map_location=torch.device('cpu')).
+🔧 Troubleshooting
+FileNotFoundError on startup: You skipped Step 3. You must run the training scripts to generate the .pth files before starting FastAPI.
 
-Cross-origin issues: The backend includes a permissive CORS policy (allow_origins=["*"]) for development. For production, lock down allowed origins.
+ERR_CONNECTION_REFUSED: The React frontend cannot reach the backend. Ensure the FastAPI server is running on port 8000.
+
+CUDA Errors: If running on a machine with a different GPU architecture than the one used for training, ensure model weights load to the CPU by default (already configured in main.py via map_location=torch.device('cpu')).
