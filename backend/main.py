@@ -90,6 +90,6 @@ async def analyze(file: UploadFile = File(...)):
     
     return {
         "class_name": f"Digit {pred_class}",
-        "confidence": round(pred_score * 100, 2),
+        "confidence": float(pred_score),  # FIX: Removed the '* 100' here
         "heatmap_base64": overlay_b64
     }
