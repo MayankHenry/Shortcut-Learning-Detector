@@ -8,6 +8,13 @@
 
 ---
 
+## 🌐 Live Demo
+**Frontend Application:** [https://shortcut-learning-detector.vercel.app/](https://shortcut-learning-detector.vercel.app/)
+
+*(Note: The frontend is deployed to Vercel. To process images and generate Grad-CAM heatmaps, the FastAPI backend must currently be running locally on port 8000).*
+
+---
+
 ## 📌 Project Overview
 This end-to-end web application detects and mitigates **Shortcut Learning** in Convolutional Neural Networks (CNNs). Deep learning models often "cheat" by learning unintended correlations (like background colors) instead of actual shapes. 
 
@@ -22,7 +29,7 @@ Users can upload images via the React dashboard, select a model, and view a **Gr
 ## 🛠️ Technology Stack
 * **Backend:** Python, FastAPI, Uvicorn
 * **Machine Learning:** PyTorch, Torchvision, NumPy, Pillow, OpenCV (`cv2`)
-* **Frontend:** React.js, Axios, CSS
+* **Frontend:** React.js (Deployed on Vercel), Axios, CSS
 
 ---
 
@@ -33,12 +40,10 @@ Create and activate a Python virtual environment in the project root:
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-
 2. Install Dependencies
 PowerShell
 pip install --upgrade pip
 pip install -r backend/requirements.txt
-
 3. Generate Model Weights (Crucial Step)
 Before starting the server, you must generate the .pth files for both AI models.
 
@@ -53,15 +58,13 @@ Keep the virtual environment active and run:
 
 PowerShell
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-5. Start the Frontend Dashboard
-Open a new terminal (leave the backend running):
+5. Access the Application
+You can now use the live frontend link (shortcut-learning-detector.vercel.app) or run the frontend locally:
 
 PowerShell
 cd frontend
 npm install
 npm start
-The application will be available at http://localhost:3000.
-
 🧪 Testing the "Shortcut Trap"
 To properly test the system and visualize the shortcut learning:
 
@@ -82,6 +85,6 @@ Unbiased Model: Will correctly classify "Digit 1" with high confidence. The Grad
 🔧 Troubleshooting
 FileNotFoundError on startup: You skipped Step 3. You must run the training scripts to generate the .pth files before starting FastAPI.
 
-ERR_CONNECTION_REFUSED: The React frontend cannot reach the backend. Ensure the FastAPI server is running on port 8000.
+ERR_CONNECTION_REFUSED: The React frontend cannot reach the backend. Ensure the FastAPI server is running locally on port 8000.
 
 CUDA Errors: If running on a machine with a different GPU architecture than the one used for training, ensure model weights load to the CPU by default (already configured in main.py via map_location=torch.device('cpu')).
