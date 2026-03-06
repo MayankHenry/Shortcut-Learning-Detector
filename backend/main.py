@@ -79,9 +79,10 @@ def get_db():
     finally:
         db.close()
 
-        
+
 @app.post("/analyze")
-async def analyze(file: UploadFile = File(...), model_type: str = Form(...)):
+@app.post("/analyze")
+async def analyze(file: UploadFile = File(...), model_type: str = Form(...), db: Session = Depends(get_db)):
     # Select the correct model based on what the React frontend asks for
     if model_type == "unbiased":
         active_model = unbiased_model
@@ -118,8 +119,19 @@ async def analyze(file: UploadFile = File(...), model_type: str = Form(...)):
     _, buffer = cv2.imencode('.jpg', overlay_large)
     overlay_b64 = base64.b64encode(buffer).decode('utf-8')
     
+    # --- DATABASE LOGGING ---
+    # Save this prediction to the SQLite database
+    new_log = PredictionLog(
+        model_type=model_type,
+        predicted_class=f"Digit {pred_class}",
+        confidence=float(pred_score * 100) # Save as percentage
+    )
+    db.add(new_log)
+    db.commit()
+    # ------------------------
+
     return {
         "class_name": f"Digit {pred_class}",
-        "confidence": float(pred_score),
+        "confidence": float(pred_score * 100),
         "heatmap_base64": overlay_b64
     }
