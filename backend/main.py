@@ -1,4 +1,6 @@
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile, Form, Depends
+from sqlalchemy.orm import Session
+from database import SessionLocal, engine, Base, PredictionLog
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import io
@@ -9,6 +11,10 @@ import numpy as np
 import cv2
 import base64
 from gradcam import GradCAM
+
+
+# Create the database tables when the server starts
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -65,6 +71,15 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
+# Dependency to get the DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+        
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...), model_type: str = Form(...)):
     # Select the correct model based on what the React frontend asks for
