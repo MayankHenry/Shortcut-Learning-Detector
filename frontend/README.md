@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# 🖥️ Shortcut Learning Detector - React Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+🌟 **Live Demo:** [Click here to view the live Vercel deployment](https://shortcut-learning-detector.vercel.app) *(Update this with your exact Vercel URL if different!)*
+🔗 **Live API Backend:** [https://shortcut-learning-detector-pgcc.onrender.com](https://shortcut-learning-detector-pgcc.onrender.com)
 
-## Available Scripts
+Welcome to the user interface of the **Shortcut Learning Detector**. 
 
-In the project directory, you can run:
+This directory contains the React.js Single Page Application (SPA) that serves as the interactive dashboard for our Deep Learning diagnostic tool. It allows users to upload custom images, select between our Biased and Unbiased PyTorch models, and visually interpret the AI's decision-making process through real-time Grad-CAM heatmaps.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🎨 Tech Stack & UI Architecture
+This frontend is designed to be lightweight, responsive, and completely stateless, relying on our FastAPI backend for all heavy Machine Learning computations.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* **Core Framework:** React.js
+* **Routing & State:** React Hooks (`useState`, `useEffect`)
+* **HTTP Client:** Axios (for communicating with the FastAPI REST API)
+* **Styling:** Custom CSS (Optimized for both Desktop and Mobile viewports)
+* **Cloud Hosting:** Vercel (Edge Network)
+* **CI/CD Integration:** Automated Vercel build pipeline
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🚀 Local Development Setup
+To run the React interface on your local machine and connect it to your local PyTorch backend, follow these steps:
 
-### `npm run build`
+### 1. Install Node Dependencies
+Ensure you have Node.js installed, then run:
+npm install
+2. Configure Environment Variables
+Create a .env file in the root of this frontend/ directory. You must tell the React app where to send the images for ML analysis.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+For local development (pointing to your local FastAPI server), add:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Code snippet
+REACT_APP_API_URL=http://localhost:8000
+3. Start the Development Server
+npm start
+The application will boot up at http://localhost:3000 and automatically reload if you make edits to the code.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+☁️ Cloud Deployment (Vercel)
+This frontend is continuously deployed to Vercel. Every time a commit is pushed to the main branch on GitHub, Vercel automatically:
 
-### `npm run eject`
+Pulls the latest React code.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Injects the production environment variables.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Builds the optimized static HTML/JS/CSS bundle.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Deploys it globally to their edge network.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Important Production Note: In the Vercel dashboard, the REACT_APP_API_URL environment variable is strictly configured to point to our live Render backend URL (https://shortcut-learning-detector-pgcc.onrender.com). Never hardcode this URL directly into the React components, as it poses a security risk and breaks local development testing.
 
-## Learn More
+🧩 User Journey & Component Flow
+Image Upload: The user selects a hand-drawn digit with a solid background color.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Model Selection: The user toggles between the "Biased Model (Cheater)" and the "Unbiased Model (Geometric Focus)".
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+API Transmission: Axios sends the image payload as multipart/form-data to the backend.
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Data Visualization: The React app receives the Base64 Grad-CAM heatmap, predicted class, and confidence score, rendering them dynamically on the dashboard.
