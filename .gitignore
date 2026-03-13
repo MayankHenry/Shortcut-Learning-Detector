@@ -14,6 +14,11 @@ npm-debug.log
 # PyTorch Datasets & Models
 backend/data/
 *.pth
+__pycache__
+.venv
+*.pyc
+.env
+predictions.db
 
 # OS generated files
 .DS_Store
