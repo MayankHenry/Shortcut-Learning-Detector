@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base, PredictionLog
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
+import redis
+import hashlib
+import json
 import os
 import cloudinary
 import cloudinary.uploader
@@ -23,6 +26,18 @@ cloudinary.config(
     api_secret = os.getenv("CLOUDINARY_API_SECRET"),
     secure = True
 )
+
+# Redis Caching Configuration
+# Pulls from environment variables. If missing, caching is bypassed safely.
+REDIS_URL = os.getenv("REDIS_URL")
+try:
+    if REDIS_URL:
+        cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
+    else:
+        cache = None
+except Exception as e:
+    print(f"Redis connection failed: {e}")
+    cache = None
 
 # Create the database tables when the server starts
 Base.metadata.create_all(bind=engine)
@@ -90,10 +105,26 @@ def get_db():
     finally:
         db.close()
 
-
-@app.post("/analyze")
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...), model_type: str = Form(...), db: Session = Depends(get_db)):
+    # Read Image bytes exactly once
+    image_data = await file.read()
+    
+    # --- REDIS CACHE CHECK ---
+    # Create a unique SHA-256 hash of the image and the chosen model
+    image_hash = hashlib.sha256(image_data).hexdigest()
+    cache_key = f"heatmap:{model_type}:{image_hash}"
+    
+    if cache is not None:
+        try:
+            cached_result = cache.get(cache_key)
+            if cached_result:
+                print("Cache hit! Returning saved heatmap instantly.")
+                return json.loads(cached_result)
+        except Exception as e:
+            print(f"Redis get error: {e}")
+    # -------------------------
+
     # Select the correct model based on what the React frontend asks for
     if model_type == "unbiased":
         active_model = unbiased_model
@@ -102,11 +133,8 @@ async def analyze(file: UploadFile = File(...), model_type: str = Form(...), db:
         active_model = biased_model
         active_cam = biased_cam
 
-    # Read Image
-    image_data = await file.read()
-    pil_img = Image.open(io.BytesIO(image_data)).convert("RGB")
-    
     # Preprocess
+    pil_img = Image.open(io.BytesIO(image_data)).convert("RGB")
     input_tensor = transform(pil_img).unsqueeze(0)
     
     # Predict
@@ -135,13 +163,10 @@ async def analyze(file: UploadFile = File(...), model_type: str = Form(...), db:
     heatmap_cloud_url = None
     
     try:
-        # If Cloudinary is configured, upload the base64 heatmap and original image
+        # If Cloudinary is configured, upload the base64 heatmap
         if os.getenv("CLOUDINARY_CLOUD_NAME"):
-            # Upload the Grad-CAM heatmap
             heatmap_upload = cloudinary.uploader.upload(f"data:image/png;base64,{overlay_b64}")
             heatmap_cloud_url = heatmap_upload.get("secure_url")
-            
-            # (In a full app, we would upload the original image bytes here too)
     except Exception as e:
         print(f"Cloud storage skipped/failed: {e}")
 
@@ -156,10 +181,21 @@ async def analyze(file: UploadFile = File(...), model_type: str = Form(...), db:
     db.add(new_log)
     db.commit()
     # -----------------------------------------------
-    # ------------------------
 
-    return {
+    # Prepare final response
+    response_data = {
         "class_name": f"Digit {pred_class}",
         "confidence": float(pred_score * 100),
         "heatmap_base64": overlay_b64
     }
+
+    # --- SAVE TO REDIS CACHE ---
+    if cache is not None:
+        try:
+            # Save the result for 24 hours (86400 seconds)
+            cache.setex(cache_key, 86400, json.dumps(response_data))
+        except Exception as e:
+            print(f"Redis set error: {e}")
+    # ---------------------------
+
+    return response_data
