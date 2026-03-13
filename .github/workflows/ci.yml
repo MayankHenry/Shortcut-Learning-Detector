@@ -50,3 +50,9 @@ jobs:
       - name: Run React Build Check
         working-directory: ./frontend
         run: npm run build
+
+      - name: Run PyTest Automated Tests
+        working-directory: ./backend
+        run: |
+          pip install pytest httpx
+          pytest test_main.py -v
