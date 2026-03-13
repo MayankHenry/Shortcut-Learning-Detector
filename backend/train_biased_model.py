@@ -1,4 +1,5 @@
 import torch
+import wandb
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
@@ -9,7 +10,6 @@ datasets.MNIST.mirrors = [
     "https://ossci-datasets.s3.amazonaws.com/mnist/",
     "http://yann.lecun.com/exdb/mnist/"
 ]
-# --------------------
 
 # 1. Define a Simple CNN
 class SimpleCNN(nn.Module):
@@ -66,6 +66,19 @@ class BiasedMNIST(torch.utils.data.Dataset):
         return colored_image, label
 
 def train_model():
+    # Initialize MLOps Tracking
+    epochs = 5
+    wandb.init(
+        project="shortcut-learning-detector",
+        name="biased-model-training", 
+        config={
+            "learning_rate": 0.001,
+            "architecture": "SimpleCNN",
+            "dataset": "Colored MNIST",
+            "epochs": epochs,
+        }
+    )
+
     print("Downloading MNIST and applying color bias...")
     transform = transforms.ToTensor()
     raw_train_data = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
@@ -79,7 +92,7 @@ def train_model():
     
     print("Training the biased model (this will take a few minutes)...")
     model.train()
-    for epoch in range(2): 
+    for epoch in range(epochs): 
         running_loss = 0.0
         for i, (inputs, labels) in enumerate(train_loader):
             optimizer.zero_grad()
@@ -89,6 +102,15 @@ def train_model():
             optimizer.step()
             
             running_loss += loss.item()
+            
+            # --- WANDB TELEMETRY LOGGING ---
+            wandb.log({
+                "epoch": epoch + 1,
+                "batch": i + 1,
+                "loss": loss.item()
+            })
+            # -------------------------------
+
             if i % 100 == 99:
                 print(f"[{epoch + 1}, {i + 1}] Loss: {running_loss / 100:.3f}")
                 running_loss = 0.0
@@ -96,6 +118,9 @@ def train_model():
     print("Training complete! Saving model...")
     torch.save(model.state_dict(), "biased_mnist_model.pth")
     print("Saved to 'biased_mnist_model.pth'")
+    
+    # Safely close the wandb run
+    wandb.finish()
 
 if __name__ == "__main__":
     train_model()
