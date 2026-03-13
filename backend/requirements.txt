@@ -7,3 +7,5 @@ opencv-python-headless==4.9.0.80
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.2.1+cpu
 torchvision==0.17.1+cpu
+sqlalchemy==2.0.28
+cloudinary==1.39.0

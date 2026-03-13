@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base, PredictionLog
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
+import os
+import cloudinary
+import cloudinary.uploader
 import io
 import torch
 import torch.nn as nn
@@ -12,6 +15,14 @@ import cv2
 import base64
 from gradcam import GradCAM
 
+# Cloudinary (Object Storage) Configuration
+# It pulls from environment variables in Render, but fails gracefully locally
+cloudinary.config(
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key = os.getenv("CLOUDINARY_API_KEY"),
+    api_secret = os.getenv("CLOUDINARY_API_SECRET"),
+    secure = True
+)
 
 # Create the database tables when the server starts
 Base.metadata.create_all(bind=engine)
@@ -119,15 +130,32 @@ async def analyze(file: UploadFile = File(...), model_type: str = Form(...), db:
     _, buffer = cv2.imencode('.jpg', overlay_large)
     overlay_b64 = base64.b64encode(buffer).decode('utf-8')
     
-    # --- DATABASE LOGGING ---
-    # Save this prediction to the SQLite database
+    # --- CLOUD OBJECT STORAGE & DATABASE LOGGING ---
+    image_url = None
+    heatmap_cloud_url = None
+    
+    try:
+        # If Cloudinary is configured, upload the base64 heatmap and original image
+        if os.getenv("CLOUDINARY_CLOUD_NAME"):
+            # Upload the Grad-CAM heatmap
+            heatmap_upload = cloudinary.uploader.upload(f"data:image/png;base64,{overlay_b64}")
+            heatmap_cloud_url = heatmap_upload.get("secure_url")
+            
+            # (In a full app, we would upload the original image bytes here too)
+    except Exception as e:
+        print(f"Cloud storage skipped/failed: {e}")
+
+    # Save to SQLite
     new_log = PredictionLog(
         model_type=model_type,
         predicted_class=f"Digit {pred_class}",
-        confidence=float(pred_score * 100) # Save as percentage
+        confidence=float(pred_score * 100),
+        original_image_url=image_url,
+        heatmap_url=heatmap_cloud_url
     )
     db.add(new_log)
     db.commit()
+    # -----------------------------------------------
     # ------------------------
 
     return {
