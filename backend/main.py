@@ -17,6 +17,8 @@ import numpy as np
 import cv2
 import base64
 from gradcam import GradCAM
+from enum import Enum
+from fastapi import HTTPException
 
 # --- 🛑 SECURITY ADDITION: Rate Limiting Imports ---
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -118,16 +120,31 @@ def get_db():
         db.close()
 
 # --- 🛑 SECURITY ADDITION: Apply Rate Limit to the Route ---
+class ModelType(str, Enum):
+    biased = "biased"
+    unbiased = "unbiased"
 @app.post("/analyze")
-@limiter.limit("10/minute")  # Restricts users to 10 image uploads per minute
-async def analyze(request: Request, file: UploadFile = File(...), model_type: str = Form(...), db: Session = Depends(get_db)):
-    # Read Image bytes exactly once
+@limiter.limit("10/minute")
+async def analyze(
+    request: Request, 
+    file: UploadFile = File(...), 
+    model_type: ModelType = Form(...), 
+    db: Session = Depends(get_db)
+):
+    # 1. Input Validation: Check if it's actually an image
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Invalid file format. Only images (PNG, JPG) are allowed.")
+
+    # 2. Input Validation: Read the file and check the size (Max 5MB)
     image_data = await file.read()
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 Megabytes
+    if len(image_data) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB.")
     
     # --- REDIS CACHE CHECK ---
     # Create a unique SHA-256 hash of the image and the chosen model
     image_hash = hashlib.sha256(image_data).hexdigest()
-    cache_key = f"heatmap:{model_type}:{image_hash}"
+    cache_key = f"heatmap:{model_type.value}:{image_hash}" # <-- Note the .value here now!
     
     if cache is not None:
         try:
