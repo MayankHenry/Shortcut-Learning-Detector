@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, Depends
+from fastapi import FastAPI, File, UploadFile, Form, Depends, Request
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base, PredictionLog
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +17,11 @@ import numpy as np
 import cv2
 import base64
 from gradcam import GradCAM
+
+# --- 🛑 SECURITY ADDITION: Rate Limiting Imports ---
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+# ----------------------------------------------------
 
 # Cloudinary (Object Storage) Configuration
 # It pulls from environment variables in Render, but fails gracefully locally
@@ -43,6 +48,13 @@ except Exception as e:
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# --- 🛑 SECURITY ADDITION: Initialize Rate Limiter ---
+# Tracks users by their IP address to prevent API spam/DDoS
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(429, _rate_limit_exceeded_handler)
+# -----------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -105,8 +117,10 @@ def get_db():
     finally:
         db.close()
 
+# --- 🛑 SECURITY ADDITION: Apply Rate Limit to the Route ---
 @app.post("/analyze")
-async def analyze(file: UploadFile = File(...), model_type: str = Form(...), db: Session = Depends(get_db)):
+@limiter.limit("10/minute")  # Restricts users to 10 image uploads per minute
+async def analyze(request: Request, file: UploadFile = File(...), model_type: str = Form(...), db: Session = Depends(get_db)):
     # Read Image bytes exactly once
     image_data = await file.read()
     
