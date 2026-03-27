@@ -1,6 +1,6 @@
-from fastapi import FastAPI, File, UploadFile, Form, Depends, Request
+from fastapi import FastAPI, File, UploadFile, Form, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine, Base, PredictionLog
+from database import SessionLocal, engine, Base, PredictionLog, User  # Make sure to import the new User model!
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import redis
@@ -18,12 +18,10 @@ import cv2
 import base64
 from gradcam import GradCAM
 from enum import Enum
-from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
-from database import User  # Make sure to import the new User model!
 
 # --- 🛑 SECURITY ADDITION: Rate Limiting Imports ---
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -31,7 +29,6 @@ from slowapi.util import get_remote_address
 # ----------------------------------------------------
 
 # Cloudinary (Object Storage) Configuration
-# It pulls from environment variables in Render, but fails gracefully locally
 cloudinary.config(
     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key = os.getenv("CLOUDINARY_API_KEY"),
@@ -40,7 +37,6 @@ cloudinary.config(
 )
 
 # Redis Caching Configuration
-# Pulls from environment variables. If missing, caching is bypassed safely.
 REDIS_URL = os.getenv("REDIS_URL")
 try:
     if REDIS_URL:
@@ -55,6 +51,7 @@ except Exception as e:
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
 # --- 🛑 SECURITY ADDITION: Authentication & Hashing ---
 SECRET_KEY = os.getenv("SECRET_KEY", "shortcut-learning-super-secret-key")
 ALGORITHM = "HS256"
@@ -74,6 +71,14 @@ def create_access_token(data: dict):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+# Dependency to get the DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.post("/register")
 def register(user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -101,7 +106,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 # ------------------------------------------------------
 
 # --- 🛑 SECURITY ADDITION: Initialize Rate Limiter ---
-# Tracks users by their IP address to prevent API spam/DDoS
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
@@ -123,7 +127,7 @@ class SimpleCNN(nn.Module):
             nn.Conv2d(3, 16, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2, 2),
-            nn.Conv2d(16, 32, kernel_size=3, padding=1), # Target this layer
+            nn.Conv2d(16, 32, kernel_size=3, padding=1), 
             nn.ReLU(),
             nn.MaxPool2d(2, 2)
         )
@@ -140,12 +144,10 @@ class SimpleCNN(nn.Module):
         return x
 
 # 2. Load BOTH trained weights
-# --- The Cheater Model ---
 biased_model = SimpleCNN()
 biased_model.load_state_dict(torch.load("biased_mnist_model.pth", map_location=torch.device('cpu')))
 biased_model.eval()
 
-# --- The Fixed Model ---
 unbiased_model = SimpleCNN()
 unbiased_model.load_state_dict(torch.load("unbiased_mnist_model.pth", map_location=torch.device('cpu')))
 unbiased_model.eval()
@@ -160,26 +162,19 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-# Dependency to get the DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# --- 🛑 SECURITY ADDITION: Apply Rate Limit to the Route ---
 class ModelType(str, Enum):
     biased = "biased"
     unbiased = "unbiased"
+
+# --- 🛑 SECURITY ADDITION: Apply Rate Limit and Auth to the Route ---
 @app.post("/analyze")
 @limiter.limit("10/minute")
 async def analyze(
     request: Request, 
     file: UploadFile = File(...), 
     model_type: ModelType = Form(...), 
-    db: Session = Depends(get_db)
-    token: str = Depends(oauth2_scheme) # <-- THIS IS THE LOCK!
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme) # <-- THE MISSING COMMA IS FIXED HERE!
 ):
     # 1. Input Validation: Check if it's actually an image
     if not file.content_type.startswith("image/"):
@@ -192,9 +187,8 @@ async def analyze(
         raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB.")
     
     # --- REDIS CACHE CHECK ---
-    # Create a unique SHA-256 hash of the image and the chosen model
     image_hash = hashlib.sha256(image_data).hexdigest()
-    cache_key = f"heatmap:{model_type.value}:{image_hash}" # <-- Note the .value here now!
+    cache_key = f"heatmap:{model_type.value}:{image_hash}" 
     
     if cache is not None:
         try:
@@ -206,8 +200,8 @@ async def analyze(
             print(f"Redis get error: {e}")
     # -------------------------
 
-    # Select the correct model based on what the React frontend asks for
-    if model_type == "unbiased":
+    # Select the correct model
+    if model_type == ModelType.unbiased:
         active_model = unbiased_model
         active_cam = unbiased_cam
     else:
@@ -253,7 +247,7 @@ async def analyze(
 
     # Save to SQLite
     new_log = PredictionLog(
-        model_type=model_type,
+        model_type=model_type.value,
         predicted_class=f"Digit {pred_class}",
         confidence=float(pred_score * 100),
         original_image_url=image_url,
