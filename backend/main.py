@@ -19,6 +19,11 @@ import base64
 from gradcam import GradCAM
 from enum import Enum
 from fastapi import HTTPException
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from passlib.context import CryptContext
+import jwt
+from datetime import datetime, timedelta
+from database import User  # Make sure to import the new User model!
 
 # --- 🛑 SECURITY ADDITION: Rate Limiting Imports ---
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -50,6 +55,50 @@ except Exception as e:
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+# --- 🛑 SECURITY ADDITION: Authentication & Hashing ---
+SECRET_KEY = os.getenv("SECRET_KEY", "shortcut-learning-super-secret-key")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440 # 24 hours
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+@app.post("/register")
+def register(user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # Check if user already exists
+    db_user = db.query(User).filter(User.username == user_data.username).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    
+    # Hash password and save to DB
+    hashed_pw = get_password_hash(user_data.password)
+    new_user = User(username=user_data.username, hashed_password=hashed_pw)
+    db.add(new_user)
+    db.commit()
+    return {"message": "User created successfully"}
+
+@app.post("/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
+    # Generate the JWT Token
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
+# ------------------------------------------------------
 
 # --- 🛑 SECURITY ADDITION: Initialize Rate Limiter ---
 # Tracks users by their IP address to prevent API spam/DDoS
@@ -130,6 +179,7 @@ async def analyze(
     file: UploadFile = File(...), 
     model_type: ModelType = Form(...), 
     db: Session = Depends(get_db)
+    token: str = Depends(oauth2_scheme) # <-- THIS IS THE LOCK!
 ):
     # 1. Input Validation: Check if it's actually an image
     if not file.content_type.startswith("image/"):
@@ -227,6 +277,5 @@ async def analyze(
             cache.setex(cache_key, 86400, json.dumps(response_data))
         except Exception as e:
             print(f"Redis set error: {e}")
-    # ---------------------------
 
     return response_data
