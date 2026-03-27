@@ -24,3 +24,9 @@ class PredictionLog(Base):
     # --- NEW: Cloud Object Storage URLs ---
     original_image_url = Column(String, nullable=True) 
     heatmap_url = Column(String, nullable=True)
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
