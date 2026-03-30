@@ -12,17 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install flake8
+      - name: Install flake8 and Test Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8
+          pip install flake8 pytest httpx
 
       - name: Lint with flake8
         run: |
@@ -31,17 +31,21 @@ jobs:
           # Exit-zero treats all other formatting warnings as just warnings
           flake8 backend/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
+      - name: Run PyTest Automated Tests
+        working-directory: ./backend
+        run: pytest test_main.py -v
+
   frontend-lint:
     name: Frontend React Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install Frontend Dependencies
         working-directory: ./frontend
@@ -49,10 +53,4 @@ jobs:
 
       - name: Run React Build Check
         working-directory: ./frontend
-        run: npm run build
-
-      - name: Run PyTest Automated Tests
-        working-directory: ./backend
-        run: |
-          pip install pytest httpx
-          pytest test_main.py -v
+        run: CI=false npm run build
