@@ -273,3 +273,25 @@ async def analyze(
             print(f"Redis set error: {e}")
 
     return response_data
+
+# --- 🛑 SECURITY ADDITION: Admin Dashboard Route ---
+@app.get("/admin/logs")
+def get_admin_logs(
+    db: Session = Depends(get_db), 
+    token: str = Depends(oauth2_scheme) # Requires them to be logged in!
+):
+    # Fetch all logs from the SQLite database, newest first
+    logs = db.query(PredictionLog).order_by(PredictionLog.id.desc()).all()
+    
+    # Format the data cleanly for the React frontend
+    formatted_logs = []
+    for log in logs:
+        formatted_logs.append({
+            "id": log.id,
+            "model_type": log.model_type,
+            "predicted_class": log.predicted_class,
+            "confidence": round(log.confidence, 2),
+            "original_image_url": log.original_image_url or "Local File",
+            "heatmap_url": log.heatmap_url or "Generated Locally"
+        })
+    return formatted_logs
