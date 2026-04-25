@@ -1,4 +1,4 @@
-# \### 📖 \[View Interactive Docs →](https://MayankHenry.github.io/Shortcut-Learning-Detector/)
+### 📖 [View Interactive Docs →](https://MayankHenry.github.io/Shortcut-Learning-Detector/)
 
 # <div align="center">
 
