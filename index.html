@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)file:///C:/Users/naiti/Downloads/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Shortcut Learning Detector · Interactive Docs</title>
+<link href="./index2_files/css2" rel="stylesheet">
+<style>
+:root{
+  --bg:#03040a;--s1:#07090f;--s2:#0b0e19;--s3:#101424;
+  --border:rgba(255,255,255,0.055);--border2:rgba(255,255,255,0.11);
+  --cyan:#00e5ff;--cyan-dim:rgba(0,229,255,0.12);
+  --green:#00e5a0;--green-dim:rgba(0,229,160,0.1);
+  --red:#ff3d6b;--red-dim:rgba(255,61,107,0.1);
+  --orange:#ff6b2b;--yellow:#ffd84d;
+  --text:#d8e0f0;--muted:#4d5a70;--muted2:#7a8aa8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:400;overflow-x:hidden;cursor:none;line-height:1.6}
+
+/* CURSOR */
+#cur{position:fixed;width:8px;height:8px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen}
+#ring{position:fixed;width:32px;height:32px;border:1px solid rgba(0,229,255,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s}
+
+/* NOISE */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");opacity:.02;pointer-events:none;z-index:0}
+
+/* ANIMATED GRID BG */
+.grid-bg{position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 0%,black 30%,transparent 100%)}
+.glow-1{position:fixed;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.07) 0%,transparent 70%);top:-200px;right:-100px;pointer-events:none;z-index:0;animation:float1 12s ease-in-out infinite}
+.glow-2{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,43,.05) 0%,transparent 70%);bottom:-100px;left:-100px;pointer-events:none;z-index:0;animation:float2 15s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,40px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+
+/* SCAN LINE */
+.scan{position:fixed;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,var(--cyan) 50%,transparent 100%);opacity:.2;z-index:1;animation:scan 8s linear infinite}
+@keyframes scan{0%{top:-1px}100%{top:100vh}}
+
+/* SIDEBAR NAV */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:240px;
+  background:rgba(7,9,15,.92);
+  border-right:1px solid var(--border);
+  z-index:100;
+  display:flex;flex-direction:column;
+  padding:0;
+  backdrop-filter:blur(20px);
+  transform:translateX(0);
+  transition:transform .3s;
+}
+.sidebar-logo{
+  padding:28px 24px 20px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;letter-spacing:.08em;
+  line-height:1.1;
+}
+.sidebar-logo-title span{color:var(--cyan)}
+.sidebar-logo-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.6rem;color:var(--muted);
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-top:4px;
+}
+.sidebar-nav{flex:1;overflow-y:auto;padding:16px 0}
+.nav-group-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.6rem;color:var(--muted);
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:12px 24px 6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 24px;font-size:.84rem;font-weight:500;
+  color:var(--muted2);text-decoration:none;
+  border-left:2px solid transparent;
+  transition:all .2s;cursor:pointer;
+}
+.nav-item:hover{color:var(--text);background:rgba(0,229,255,.04);border-left-color:rgba(0,229,255,.3)}
+.nav-item.active{color:var(--cyan);background:var(--cyan-dim);border-left-color:var(--cyan)}
+.nav-item .ni{font-size:.9rem;width:18px;text-align:center}
+.sidebar-footer{
+  padding:16px 24px;border-top:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;color:var(--muted);line-height:1.7;
+}
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);margin-right:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* MOBILE TOGGLE */
+.mob-toggle{display:none;position:fixed;top:16px;left:16px;z-index:200;width:40px;height:40px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;align-items:center;justify-content:center;cursor:none;font-size:1rem}
+
+/* MAIN */
+.main{margin-left:240px;position:relative;z-index:2}
+.page{max-width:820px;padding:0 48px 120px}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:80px 48px 80px;
+  position:relative;
+  border-bottom:1px solid var(--border);
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;color:var(--cyan);
+  letter-spacing:.14em;text-transform:uppercase;
+  margin-bottom:32px;
+  opacity:0;animation:up .6s .1s ease forwards;
+}
+.hero-tag::before{content:'';width:28px;height:1px;background:var(--cyan);opacity:.5}
+.hero-h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.5rem,8vw,7.5rem);
+  line-height:.9;letter-spacing:.03em;
+  opacity:0;animation:up .7s .2s ease forwards;
+  margin-bottom:6px;
+}
+.hero-h1 .w1{display:block;color:var(--text)}
+.hero-h1 .w2{display:block;color:var(--cyan);position:relative}
+.hero-h1 .w2::after{
+  content:'';position:absolute;
+  left:0;bottom:-4px;height:3px;width:0%;
+  background:var(--cyan);border-radius:2px;
+  animation:underline-grow 1s 1.2s ease forwards;
+  box-shadow:0 0 16px var(--cyan);
+}
+@keyframes underline-grow{to{width:100%}}
+.hero-h1 .w3{display:block;color:var(--text)}
+.hero-p{
+  font-size:.98rem;color:var(--muted2);font-weight:300;
+  max-width:520px;line-height:1.85;
+  margin:28px 0 36px;
+  opacity:0;animation:up .6s .5s ease forwards;
+}
+.hero-chips{
+  display:flex;flex-wrap:wrap;gap:10px;margin-bottom:36px;
+  opacity:0;animation:up .6s .65s ease forwards;
+}
+.chip{
+  display:flex;align-items:center;gap:7px;
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:100px;padding:7px 14px;font-size:.78rem;
+  transition:all .25s;
+}
+.chip:hover{border-color:rgba(0,229,255,.3);background:var(--s3);transform:translateY(-1px)}
+.chip-dot{width:5px;height:5px;border-radius:50%}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;opacity:0;animation:up .6s .8s ease forwards}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:12px 24px;border-radius:9px;
+  font-size:.85rem;font-weight:600;
+  text-decoration:none;transition:all .25s;
+  position:relative;overflow:hidden;
+}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .5s}
+.btn:hover::before{transform:translateX(100%)}
+.btn-p{background:var(--cyan);color:#03040a;box-shadow:0 0 20px rgba(0,229,255,.2)}
+.btn-p:hover{background:#2aeeff;box-shadow:0 0 36px rgba(0,229,255,.4);transform:translateY(-2px)}
+.btn-s{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-s:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px)}
+
+/* STATS ROW */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--border);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-top:60px;
+  opacity:0;animation:up .6s 1s ease forwards;
+}
+.stat{background:var(--s1);padding:20px 24px;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--cyan);letter-spacing:.05em}
+.stat-label{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+
+/* SECTIONS */
+.section{padding:80px 48px 0;scroll-margin-top:40px}
+.sec-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.65rem;color:var(--cyan);
+  letter-spacing:.14em;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.sec-eyebrow::before{content:'';width:20px;height:1px;background:var(--cyan)}
+.sec-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2rem,4vw,3rem);
+  letter-spacing:.04em;margin-bottom:32px;
+}
+.sec-title .ac{color:var(--cyan)}
+
+/* CARDS */
+.card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:14px;padding:24px 28px;margin-bottom:14px;
+  transition:border-color .3s,transform .3s,box-shadow .3s;
+  position:relative;overflow:hidden;
+}
+.card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,.025),transparent 50%);opacity:0;transition:opacity .3s}
+.card:hover{border-color:rgba(0,229,255,.18);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.card:hover::after{opacity:1}
+p.cb{font-size:.88rem;color:var(--muted2);line-height:1.78}
+
+/* MODEL COMPARISON */
+.model-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.mc{border-radius:14px;padding:22px;position:relative;overflow:hidden}
+.mc.b{background:linear-gradient(135deg,rgba(255,61,107,.07),rgba(255,107,43,.04));border:1px solid rgba(255,61,107,.22)}
+.mc.u{background:linear-gradient(135deg,rgba(0,229,160,.07),rgba(0,229,255,.04));border:1px solid rgba(0,229,160,.22)}
+.mc::before{content:'';position:absolute;top:-50px;right:-50px;width:130px;height:130px;border-radius:50%;opacity:.05}
+.mc.b::before{background:var(--red)}
+.mc.u::before{background:var(--green)}
+.mc-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:3px 10px;border-radius:100px;margin-bottom:12px;letter-spacing:.08em;text-transform:uppercase}
+.b .mc-badge{background:rgba(255,61,107,.14);color:var(--red)}
+.u .mc-badge{background:rgba(0,229,160,.12);color:var(--green)}
+.mc-name{font-weight:700;font-size:.95rem;margin-bottom:8px}
+.mc-body{font-size:.81rem;color:var(--muted2);line-height:1.7}
+.mc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid rgba(255,255,255,.05);margin-top:10px;font-size:.78rem}
+.mc-row-label{color:var(--muted)}
+.mc-row-val{font-weight:600;font-family:'JetBrains Mono',monospace;font-size:.75rem}
+.b .mc-row-val{color:var(--red)}
+.u .mc-row-val{color:var(--green)}
+
+/* TECH CHIPS */
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px}
+.tc{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:all .22s;cursor:default}
+.tc:hover{border-color:rgba(0,229,255,.22);background:var(--s3);transform:translateY(-2px)}
+.tc-cat{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.tc-name{font-weight:600;font-size:.82rem}
+
+/* STEPS */
+.steps{counter-reset:sc}
+.step{display:flex;gap:18px;padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--border);counter-increment:sc}
+.step:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+.sn{width:34px;height:34px;flex-shrink:0;border-radius:9px;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--cyan);margin-top:2px}
+.sn::before{content:counter(sc,decimal-leading-zero)}
+.sb h4{font-weight:600;font-size:.9rem;margin-bottom:7px}
+.sb p{font-size:.84rem;color:var(--muted2);line-height:1.7;margin-bottom:0}
+
+/* CODE */
+pre{background:#010204;border:1px solid var(--border);border-left:2px solid var(--cyan);border-radius:10px;padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:.77rem;color:#8ecfdf;overflow-x:auto;margin:10px 0 14px;line-height:1.7;position:relative}
+pre .cm{color:#2d4555}
+code{font-family:'JetBrains Mono',monospace;font-size:.79rem;background:rgba(0,229,255,.07);color:var(--cyan);padding:2px 7px;border-radius:5px}
+
+/* FLOW */
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:16px 0}
+.fn{background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:8px 14px;font-size:.77rem;font-weight:500;white-space:nowrap;transition:all .2s}
+.fn:hover{border-color:var(--cyan);color:var(--cyan)}
+.fa{padding:0 6px;color:var(--muted);font-size:.85rem}
+
+/* TABLE */
+.tw{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+thead tr{background:var(--s2)}
+th{padding:11px 16px;text-align:left;font-weight:600;font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--muted2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+
+/* PILLS */
+.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.7rem;font-weight:600;font-family:'JetBrains Mono',monospace}
+.pc{background:rgba(0,229,255,.1);color:var(--cyan)}
+.pg{background:rgba(0,229,160,.1);color:var(--green)}
+.pr{background:rgba(255,61,107,.1);color:var(--red)}
+.po{background:rgba(255,107,43,.1);color:var(--orange)}
+
+/* ALERTS */
+.al{border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;font-size:.84rem;line-height:1.7;margin:14px 0}
+.ali{flex-shrink:0;margin-top:1px}
+.al.w{background:rgba(255,216,77,.05);border:1px solid rgba(255,216,77,.18);color:#ffe08a}
+.al.i{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);color:#7de8ff}
+.al.s{background:rgba(0,229,160,.05);border:1px solid rgba(0,229,160,.18);color:#7dffc8}
+.al.d{background:rgba(255,61,107,.05);border:1px solid rgba(255,61,107,.18);color:#ff9db8}
+
+/* PIPELINE */
+.pipe{margin:18px 0}
+.ps{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;background:var(--s1);border:1px solid var(--border);border-radius:11px;margin-bottom:7px;transition:all .25s}
+.ps:hover{border-color:rgba(0,229,255,.18);background:var(--s2)}
+.pn{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:rgba(0,229,255,.18);line-height:1;flex-shrink:0;width:26px;transition:color .25s}
+.ps:hover .pn{color:var(--cyan)}
+.pc2 h4{font-weight:600;font-size:.88rem;margin-bottom:3px}
+.pc2 p{font-size:.81rem;color:var(--muted2)}
+
+/* TEST CARDS */
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:10px}
+.tc2{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start;transition:border-color .25s}
+.tc2:hover{border-color:rgba(0,229,160,.28)}
+.ck{width:24px;height:24px;flex-shrink:0;background:rgba(0,229,160,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:.8rem}
+.tc2 h4{font-weight:600;font-size:.85rem;margin-bottom:3px}
+.tc2 p{font-size:.78rem;color:var(--muted2);line-height:1.6}
+
+/* TROUBLESHOOT */
+.tr2{border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:10px;transition:border-color .25s}
+.tr2:hover{border-color:rgba(0,229,255,.18)}
+.tq{padding:14px 18px;background:var(--s1);display:flex;align-items:center;gap:10px;font-weight:600;font-size:.85rem}
+.tt{font-family:'JetBrains Mono',monospace;font-size:.68rem;background:rgba(255,61,107,.12);color:var(--red);padding:2px 9px;border-radius:5px;flex-shrink:0}
+.ta{padding:14px 18px;background:var(--s2);font-size:.83rem;color:var(--muted2);line-height:1.7;border-top:1px solid var(--border)}
+
+/* ARCH DIAGRAM */
+.arch{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:14px;padding:24px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.72rem;line-height:1.9;
+  color:#6a8fa8;overflow-x:auto;
+}
+.arch .h{color:var(--cyan)}
+.arch .g{color:var(--green)}
+.arch .o{color:var(--orange)}
+.arch .r{color:var(--red)}
+.arch .y{color:var(--yellow)}
+
+/* SCROLL REVEAL */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.rv.on{opacity:1;transform:translateY(0)}
+
+/* PROGRESS BAR TOP */
+.progress-bar{position:fixed;top:0;left:240px;right:0;height:2px;background:var(--border);z-index:200}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));width:0%;transition:width .1s;box-shadow:0 0 8px var(--cyan)}
+
+/* FOOTER */
+.footer{padding:60px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.fb{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;color:var(--muted)}
+.fb span{color:var(--cyan)}
+.fi{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);text-align:right;line-height:1.9}
+
+/* ANIM */
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:10px}
+
+/* RESPONSIVE */
+@media(max-width:800px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .progress-bar{left:0}
+  .mob-toggle{display:flex}
+  .hero,.section{padding-left:24px;padding-right:24px}
+  .page{padding:0 24px 80px}
+  .model-row{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .footer{padding:40px 24px;flex-direction:column;align-items:flex-start}
+  .fi{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<div id="cur" style="left: 940px; top: 179px;"></div>
+<div id="ring" style="left: 915.66px; top: 187.675px;"></div>
+<div class="grid-bg"></div>
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+<div class="scan"></div>
+<div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%;"></div></div>
+
+<!-- MOBILE TOGGLE -->
+<button class="mob-toggle" id="mob-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-title">Shortcut<br><span>Learning</span><br>Detector</div>
+    <div class="sidebar-logo-sub">Project 45 · Team 85</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group-label">Introduction</div>
+    <a class="nav-item active" onclick="scrollTo(&#39;hero&#39;)"><span class="ni">🏠</span> Overview</a>
+    <a class="nav-item" onclick="scrollTo(&#39;problem&#39;)"><span class="ni">🧠</span> The Problem</a>
+    <a class="nav-item" onclick="scrollTo(&#39;models&#39;)"><span class="ni">⚔️</span> Two Models</a>
+
+    <div class="nav-group-label">Technical</div>
+    <a class="nav-item" onclick="scrollTo(&#39;stack&#39;)"><span class="ni">🛠️</span> Tech Stack</a>
+    <a class="nav-item" onclick="scrollTo(&#39;arch&#39;)"><span class="ni">🏗️</span> Architecture</a>
+    <a class="nav-item" onclick="scrollTo(&#39;data&#39;)"><span class="ni">🗄️</span> Data Storage</a>
+
+    <div class="nav-group-label">Getting Started</div>
+    <a class="nav-item" onclick="scrollTo(&#39;setup&#39;)"><span class="ni">🚀</span> Local Setup</a>
+    <a class="nav-item" onclick="scrollTo(&#39;envvars&#39;)"><span class="ni">🔑</span> Env Variables</a>
+    <a class="nav-item" onclick="scrollTo(&#39;trap&#39;)"><span class="ni">🪤</span> Test the Trap</a>
+
+    <div class="nav-group-label">DevOps</div>
+    <a class="nav-item" onclick="scrollTo(&#39;cicd&#39;)"><span class="ni">🔄</span> CI / CD</a>
+    <a class="nav-item" onclick="scrollTo(&#39;tests&#39;)"><span class="ni">✅</span> Test Coverage</a>
+    <a class="nav-item" onclick="scrollTo(&#39;deploy&#39;)"><span class="ni">☁️</span> Deployment</a>
+    <a class="nav-item" onclick="scrollTo(&#39;trouble&#39;)"><span class="ni">🔧</span> Troubleshoot</a>
+  </div>
+  <div class="sidebar-footer">
+    <div><span class="live-dot"></span>Live on Vercel + Render</div>
+    <div>GLA University · 4th Sem AIML</div>
+    <div>Mentor: Mr. Preshit Desai</div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- ══════ HERO ══════ -->
+<section class="hero" id="hero">
+  <div class="hero-tag">Project 45 &nbsp;·&nbsp; Team 85 &nbsp;·&nbsp; GLA University</div>
+  <h1 class="hero-h1">
+    <span class="w1">Shortcut</span>
+    <span class="w2">Learning</span>
+    <span class="w3">Detector</span>
+  </h1>
+  <p class="hero-p">An end-to-end deep learning diagnostic system that <strong style="color:var(--text)">exposes and mitigates Shortcut Learning</strong> in CNNs — built with PyTorch, FastAPI, React, and real-time Grad-CAM heatmap visualization.</p>
+  <div class="hero-chips">
+    <div class="chip"><span class="chip-dot" style="background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></span>Mayank (Leader)</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--orange);box-shadow:0 0 6px var(--orange)"></span>Naitik Agarwal</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></span>Radhika Gupta</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--yellow);box-shadow:0 0 6px var(--yellow)"></span>Mentor · Mr. Preshit Desai</div>
+  </div>
+  <div class="hero-btns">
+    <a href="https://shortcut-learning-detector.vercel.app/" class="btn btn-p" target="_blank">🌐 Live Frontend</a>
+    <a href="https://shortcut-learning-detector-pgcc.onrender.com/docs" class="btn btn-s" target="_blank">⚙️ API Swagger Docs</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label">CNN Models</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Tests Passing</div></div>
+    <div class="stat"><div class="stat-num">8+</div><div class="stat-label">Technologies</div></div>
+    <div class="stat"><div class="stat-num">Live</div><div class="stat-label">Production</div></div>
+  </div>
+</section>
+
+<!-- ══════ PROBLEM ══════ -->
+<section class="section rv on" id="problem">
+  <div class="sec-eyebrow">Core Concept</div>
+  <h2 class="sec-title">The <span class="ac">Problem</span></h2>
+  <div class="card">
+    <p class="cb">Deep learning models frequently <strong style="color:var(--text)">"cheat"</strong> — instead of learning the actual geometric shape of a digit, they latch onto the <em>background color</em> that was always present during training. This is called <strong style="color:var(--cyan)">Shortcut Learning</strong>, and it makes models dangerously brittle in the real world.</p>
+  </div>
+  <div class="arch" style="margin-top:14px">
+<span class="cm">Training Signal:</span>
+  Digit <span class="g">"1"</span> → always on <span class="g">GREEN</span> background
+
+<span class="cm">What the CNN actually learns:</span>
+  <span class="r">GREEN pixels</span> → predict class 1   <span class="cm">← SHORTCUT (WRONG!)</span>
+
+<span class="cm">What it SHOULD learn:</span>
+  <span class="g">Vertical stroke shape</span> → predict class 1   <span class="cm">← GEOMETRY (CORRECT)</span>
+
+<span class="cm">Result:</span>
+  Change background color → <span class="r">model fails completely</span>
+  </div>
+</section>
+
+<!-- ══════ MODELS ══════ -->
+<section class="section rv on" id="models">
+  <div class="sec-eyebrow">The Experiment</div>
+  <h2 class="sec-title">Two <span class="ac">Models</span></h2>
+  <div class="model-row">
+    <div class="mc b">
+      <span class="mc-badge">Biased</span>
+      <div class="mc-name">🔴 The Cheater</div>
+      <p class="mc-body">Trained on strictly color-correlated MNIST. Background color = the shortcut it exploits.</p>
+      <div class="mc-row"><span class="mc-row-label">Training</span><span class="mc-row-val">Color-correlated MNIST</span></div>
+      <div class="mc-row"><span class="mc-row-label">Learns</span><span class="mc-row-val">Background hue</span></div>
+      <div class="mc-row"><span class="mc-row-label">Real-world</span><span class="mc-row-val">FAILS on color change</span></div>
+      <div class="mc-row"><span class="mc-row-label">Grad-CAM</span><span class="mc-row-val">Highlights background</span></div>
+    </div>
+    <div class="mc u">
+      <span class="mc-badge">Unbiased</span>
+      <div class="mc-name">🟢 The Fixed</div>
+      <p class="mc-body">Trained with randomized backgrounds — forced to learn actual stroke geometry.</p>
+      <div class="mc-row"><span class="mc-row-label">Training</span><span class="mc-row-val">Augmented MNIST</span></div>
+      <div class="mc-row"><span class="mc-row-label">Learns</span><span class="mc-row-val">Geometric stroke</span></div>
+      <div class="mc-row"><span class="mc-row-label">Real-world</span><span class="mc-row-val">CORRECT always</span></div>
+      <div class="mc-row"><span class="mc-row-label">Grad-CAM</span><span class="mc-row-val">Highlights digit</span></div>
+    </div>
+  </div>
+  <div style="margin-top:14px">
+    <div class="sec-eyebrow" style="margin-bottom:12px">End-to-End Flow</div>
+    <div class="flow">
+      <span class="fn">📤 Upload</span><span class="fa">→</span>
+      <span class="fn">🔘 Model Select</span><span class="fa">→</span>
+      <span class="fn">🌐 Axios POST</span><span class="fa">→</span>
+      <span class="fn">⚙️ FastAPI</span><span class="fa">→</span>
+      <span class="fn">🧠 PyTorch</span><span class="fa">→</span>
+      <span class="fn">🔥 Grad-CAM</span><span class="fa">→</span>
+      <span class="fn">📊 Dashboard</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ TECH STACK ══════ -->
+<section class="section rv on" id="stack">
+  <div class="sec-eyebrow">Technologies</div>
+  <h2 class="sec-title">Full <span class="ac">Tech Stack</span></h2>
+  <div class="card">
+    <div class="tech-grid">
+      <div class="tc"><div class="tc-cat">Frontend</div><div class="tc-name">React.js</div></div>
+      <div class="tc"><div class="tc-cat">HTTP Client</div><div class="tc-name">Axios</div></div>
+      <div class="tc"><div class="tc-cat">UI Hosting</div><div class="tc-name">Vercel Edge</div></div>
+      <div class="tc"><div class="tc-cat">API</div><div class="tc-name">FastAPI</div></div>
+      <div class="tc"><div class="tc-cat">Runtime</div><div class="tc-name">Python 3.10</div></div>
+      <div class="tc"><div class="tc-cat">ASGI</div><div class="tc-name">Uvicorn</div></div>
+      <div class="tc"><div class="tc-cat">ML Engine</div><div class="tc-name">PyTorch</div></div>
+      <div class="tc"><div class="tc-cat">Vision</div><div class="tc-name">Torchvision</div></div>
+      <div class="tc"><div class="tc-cat">Heatmaps</div><div class="tc-name">OpenCV</div></div>
+      <div class="tc"><div class="tc-cat">Database</div><div class="tc-name">SQLite + ORM</div></div>
+      <div class="tc"><div class="tc-cat">CDN Storage</div><div class="tc-name">Cloudinary</div></div>
+      <div class="tc"><div class="tc-cat">Caching</div><div class="tc-name">Redis</div></div>
+      <div class="tc"><div class="tc-cat">MLOps</div><div class="tc-name">W&amp;B</div></div>
+      <div class="tc"><div class="tc-cat">Container</div><div class="tc-name">Docker</div></div>
+      <div class="tc"><div class="tc-cat">Testing</div><div class="tc-name">PyTest + HTTPX</div></div>
+      <div class="tc"><div class="tc-cat">CI / CD</div><div class="tc-name">GitHub Actions</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ ARCHITECTURE ══════ -->
+<section class="section rv on" id="arch">
+  <div class="sec-eyebrow">System Design</div>
+  <h2 class="sec-title">System <span class="ac">Architecture</span></h2>
+  <div class="arch">
+<span class="h">┌─────────────────────────────────────────────────────┐</span>
+<span class="h">│              USER BROWSER (React · Vercel)          │</span>
+<span class="h">└────────────────────────┬────────────────────────────┘</span>
+                         │  Axios  multipart/form-data
+                         ▼
+<span class="h">┌─────────────────────────────────────────────────────┐</span>
+<span class="h">│              FastAPI BACKEND (Render)                │</span>
+│                                                     │
+│  <span class="g">┌───────────┐</span>   <span class="o">┌──────────────┐</span>   <span class="y">┌───────────┐</span>  │
+│  <span class="g">│  PyTorch  │</span>──▶<span class="o">│ OpenCV       │</span>   <span class="y">│ Weights &amp; │</span>  │
+│  <span class="g">│ Inference │</span>   <span class="o">│ Grad-CAM     │</span>   <span class="y">│ Biases    │</span>  │
+│  <span class="g">└───────────┘</span>   <span class="o">└──────┬───────┘</span>   <span class="y">└───────────┘</span>  │
+│                         │                           │
+│  <span class="r">┌───────────┐</span>   <span class="h">┌──────▼───────┐</span>   <span class="g">┌───────────┐</span>  │
+│  <span class="r">│  Redis    │</span>   <span class="h">│  Cloudinary  │</span>   <span class="g">│  SQLite   │</span>  │
+│  <span class="r">│  Cache    │</span>   <span class="h">│  CDN Upload  │</span>   <span class="g">│  + ORM    │</span>  │
+│  <span class="r">└───────────┘</span>   <span class="h">└──────────────┘</span>   <span class="g">└───────────┘</span>  │
+<span class="h">└─────────────────────────────────────────────────────┘</span>
+  </div>
+</section>
+
+<!-- ══════ DATA ══════ -->
+<section class="section rv on" id="data">
+  <div class="sec-eyebrow">Storage Strategy</div>
+  <h2 class="sec-title">Data <span class="ac">Architecture</span></h2>
+  <div class="card">
+    <p class="cb" style="margin-bottom:18px">A hybrid strategy separates structured telemetry from heavy blobs — preventing database bloat and enabling fast CDN delivery.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Store</th><th>Technology</th><th>What It Holds</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill pc">SQLite</span></td><td><code>predictions.db</code> · SQLAlchemy ORM</td><td>Timestamps, model, confidence, class, CDN URL</td></tr>
+          <tr><td><span class="pill pg">Cloudinary</span></td><td>CDN Object Storage</td><td>Raw Grad-CAM Base64 heatmap images</td></tr>
+          <tr><td><span class="pill po">Redis</span></td><td>In-memory Cache</td><td>Hot predictions — avoids redundant inference</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="al i"><span class="ali">💡</span><span>SQLite stores only the Cloudinary CDN URL — not the raw Base64 blob. React fetches heatmaps directly from CDN edge, the inference server is never burdened.</span></div>
+  </div>
+</section>
+
+<!-- ══════ SETUP ══════ -->
+<section class="section rv on" id="setup">
+  <div class="sec-eyebrow">Getting Started</div>
+  <h2 class="sec-title">Local <span class="ac">Setup</span></h2>
+  <p style="color:var(--muted2);font-size:.88rem;margin-bottom:24px">Windows PowerShell · Requires Python 3.10+ and Node.js</p>
+  <div class="card">
+    <div class="steps">
+      <div class="step"><div class="sn"></div><div class="sb"><h4>Create &amp; Activate Virtual Environment</h4><pre>python -m venv .venv
+.\.venv\Scripts\Activate.ps1</pre></div></div>
+      <div class="step"><div class="sn"></div><div class="sb"><h4>Install Dependencies</h4><pre>pip install --upgrade pip
+pip install -r backend/requirements.txt</pre></div></div>
+      <div class="step"><div class="sn"></div><div class="sb">
+        <h4>Generate Model Weights &nbsp;<span style="color:var(--red);font-family:&#39;JetBrains Mono&#39;,monospace;font-size:.7rem">CRITICAL</span></h4>
+        <p>Downloads MNIST, applies color transforms, trains both CNNs, saves <code>.pth</code> files. Skipping causes <code>FileNotFoundError</code>.</p>
+        <pre>cd backend
+python train_biased_model.py
+python train_unbiased_model.py</pre>
+      </div></div>
+      <div class="step"><div class="sn"></div><div class="sb"><h4>Start FastAPI Backend</h4><pre>uvicorn main:app --reload --host 0.0.0.0 --port 8000</pre><p>Swagger docs: <code>http://localhost:8000/docs</code></p></div></div>
+      <div class="step"><div class="sn"></div><div class="sb"><h4>Launch Frontend <span style="color:var(--muted);font-weight:400;font-size:.8rem">(or use live Vercel app)</span></h4><pre>cd frontend
+npm install &amp;&amp; npm start</pre><p>Runs at <code>http://localhost:3000</code></p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ ENV VARS ══════ -->
+<section class="section rv on" id="envvars">
+  <div class="sec-eyebrow">Configuration</div>
+  <h2 class="sec-title">Environment <span class="ac">Variables</span></h2>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-weight:600;font-size:.88rem;margin-bottom:12px">📄 backend/.env</div>
+    <pre><span class="cm"># Cloudinary — Grad-CAM image storage</span>
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+<span class="cm"># Redis — In-memory caching</span>
+REDIS_URL=redis://your_redis_url:port
+
+<span class="cm"># Weights &amp; Biases — MLOps tracking</span>
+WANDB_API_KEY=your_wandb_api_key</pre>
+  </div>
+  <div class="card">
+    <div style="font-weight:600;font-size:.88rem;margin-bottom:12px">📄 frontend/.env</div>
+    <pre><span class="cm"># Local dev (points to your local FastAPI)</span>
+REACT_APP_API_URL=http://localhost:8000</pre>
+    <div class="al w"><span class="ali">⚠️</span><span><strong>Never hardcode the backend URL</strong> into React components. In Vercel's dashboard, <code>REACT_APP_API_URL</code> is set to the Render production URL.</span></div>
+  </div>
+</section>
+
+<!-- ══════ TRAP ══════ -->
+<section class="section rv on" id="trap">
+  <div class="sec-eyebrow">Demonstration</div>
+  <h2 class="sec-title">Test the <span class="ac">Shortcut Trap</span></h2>
+  <p style="color:var(--muted2);font-size:.88rem;margin-bottom:22px">Trigger a live misclassification and watch Grad-CAM reveal what the biased model is actually "seeing."</p>
+  <div class="card">
+    <div class="steps">
+      <div class="step"><div class="sn"></div><div class="sb"><h4>Open an image editor (MS Paint)</h4><p>Create a new square canvas — 500 × 500 px.</p></div></div>
+      <div class="step"><div class="sn"></div><div class="sb"><h4>Flood-fill background with <span style="color:var(--green)">Solid Green</span> or <span style="color:var(--red)">Solid Red</span></h4><p>Use the paint-bucket tool to color the entire canvas.</p></div></div>
+      <div class="step"><div class="sn"></div><div class="sb"><h4>Draw digit <span style="color:var(--cyan)">"1"</span> in Solid White, centered</h4><p>Use a thick brush, centered on the canvas.</p></div></div>
+      <div class="step"><div class="sn"></div><div class="sb">
+        <h4>Upload and compare both models</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+          <div class="al d" style="margin:0;font-size:.8rem"><span class="ali">🔴</span><span><strong>Biased</strong> misclassifies. Grad-CAM highlights background — ignores the digit.</span></div>
+          <div class="al s" style="margin:0;font-size:.8rem"><span class="ali">🟢</span><span><strong>Unbiased</strong> correctly says "1". Grad-CAM highlights the stroke.</span></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ CI/CD ══════ -->
+<section class="section rv on" id="cicd">
+  <div class="sec-eyebrow">DevOps</div>
+  <h2 class="sec-title">CI / CD <span class="ac">Pipeline</span></h2>
+  <p style="color:var(--muted2);font-size:.88rem;margin-bottom:22px">Every <code>push</code> or <code>pull_request</code> to <code>main</code> triggers GitHub Actions.</p>
+  <div class="pipe">
+    <div class="ps"><div class="pn">01</div><div class="pc2"><h4>Environment Provisioning</h4><p><code>ubuntu-latest</code> runner · Python 3.10 · Clean reproducible build</p></div></div>
+    <div class="ps"><div class="pn">02</div><div class="pc2"><h4>Dependency Installation</h4><p><code>pip install -r backend/requirements.txt</code> — PyTorch, OpenCV, FastAPI included</p></div></div>
+    <div class="ps"><div class="pn">03</div><div class="pc2"><h4>PyTest Suite</h4><p>TestClient + HTTPX simulates full API cycles. <strong style="color:var(--red)">Single failure = pipeline halted.</strong></p><pre style="margin-top:10px">pytest test_main.py -v</pre></div></div>
+    <div class="ps" style="border-color:rgba(0,229,160,.2)"><div class="pn" style="color:rgba(0,229,160,.25)">04</div><div class="pc2"><h4>Continuous Deployment ✓</h4><p>100% pass → Vercel + Render auto-deploy globally.</p></div></div>
+  </div>
+  <div class="tw" style="margin-top:18px">
+    <table>
+      <thead><tr><th>Component</th><th>Technology</th><th>Host</th><th>Trigger</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Frontend UI</strong></td><td>React.js</td><td><span class="pill pc">Vercel</span></td><td>Auto · <code>main</code> merge</td></tr>
+        <tr><td><strong>Backend API</strong></td><td>FastAPI · Python</td><td><span class="pill pg">Render</span></td><td>Auto · <code>main</code> merge</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════ TESTS ══════ -->
+<section class="section rv on" id="tests">
+  <div class="sec-eyebrow">Quality Assurance</div>
+  <h2 class="sec-title">Test <span class="ac">Coverage</span></h2>
+  <div class="card" style="margin-bottom:14px"><p class="cb" style="margin-bottom:12px">PyTest + HTTPX simulates full API cycles without a live server.</p><pre>pytest test_main.py -v</pre></div>
+  <div class="tg">
+    <div class="tc2"><div class="ck">✓</div><div><h4>Endpoint Health</h4><p><code>/docs</code> and core routes return <code>200 OK</code>.</p></div></div>
+    <div class="tc2"><div class="ck">✓</div><div><h4>Error Handling</h4><p>Invalid routes return <code>404 Not Found</code>.</p></div></div>
+    <div class="tc2"><div class="ck">✓</div><div><h4>Model Loading</h4><p>Both <code>.pth</code> files are loadable and uncorrupted.</p></div></div>
+  </div>
+  <div class="al w" style="margin-top:14px"><span class="ali">⚠️</span><span><strong>100% pass rate mandatory.</strong> Any failure blocks deployment immediately.</span></div>
+</section>
+
+<!-- ══════ DEPLOY ══════ -->
+<section class="section rv on" id="deploy">
+  <div class="sec-eyebrow">Production</div>
+  <h2 class="sec-title">Live <span class="ac">Deployment</span></h2>
+  <div class="card">
+    <div class="tw" style="margin:0">
+      <table>
+        <thead><tr><th>Component</th><th>Platform</th><th>URL</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Frontend</strong></td><td><span class="pill pc">Vercel</span></td><td><a href="https://shortcut-learning-detector.vercel.app/" style="color:var(--cyan);font-size:.8rem">shortcut-learning-detector.vercel.app</a></td></tr>
+          <tr><td><strong>Backend API</strong></td><td><span class="pill pg">Render</span></td><td><a href="https://shortcut-learning-detector-pgcc.onrender.com/" style="color:var(--cyan);font-size:.8rem">shortcut-learning-detector-pgcc.onrender.com</a></td></tr>
+          <tr><td><strong>Swagger Docs</strong></td><td><span class="pill pg">Render</span></td><td><a href="https://shortcut-learning-detector-pgcc.onrender.com/docs" style="color:var(--cyan);font-size:.8rem">.../docs</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ TROUBLESHOOT ══════ -->
+<section class="section rv on" id="trouble">
+  <div class="sec-eyebrow">Support</div>
+  <h2 class="sec-title">Common <span class="ac">Errors</span></h2>
+  <div class="tr2"><div class="tq"><span class="tt">FileNotFoundError</span> Server fails to start</div><div class="ta">Skipped model training. Run both scripts: <code>python train_biased_model.py</code> and <code>python train_unbiased_model.py</code> inside <code>backend/</code>.</div></div>
+  <div class="tr2"><div class="tq"><span class="tt">ERR_CONNECTION_REFUSED</span> Upload fails</div><div class="ta">FastAPI not running. Start it with <code>uvicorn main:app --reload --port 8000</code>. Check <code>frontend/.env</code> has <code>REACT_APP_API_URL=http://localhost:8000</code>.</div></div>
+  <div class="tr2"><div class="tq"><span class="tt">CUDA Error</span> Model won't load</div><div class="ta">No GPU needed. <code>main.py</code> already loads weights with <code>map_location=torch.device('cpu')</code>. No changes needed.</div></div>
+  <div class="tr2"><div class="tq"><span class="tt">Cloudinary / Redis</span> Connection fails</div><div class="ta">Optional for local dev — app degrades gracefully. Add credentials to <code>backend/.env</code> for full production functionality.</div></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="fb">Shortcut<span> Learning</span><br>Detector</div>
+  <div class="fi">
+    <div><span class="live-dot"></span>Production · Vercel + Render</div>
+    <div>Project 45 · Team 85 · GLA University</div>
+    <div>4th Semester AIML · Mentor: Mr. Preshit Desai</div>
+  </div>
+</footer>
+
+</main>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,.card,.tc,.mc,.ps,.tr2,.nav-item,.btn').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='14px';cur.style.height='14px';ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(0,229,255,.6)'});
+  el.addEventListener('mouseleave',()=>{cur.style.width='8px';cur.style.height='8px';ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(0,229,255,.35)'});
+});
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('on')}),{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+// PROGRESS BAR
+const prog=document.getElementById('prog');
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
+  prog.style.width=pct+'%';
+});
+
+// ACTIVE NAV
+const sections=['hero','problem','models','stack','arch','data','setup','envvars','trap','cicd','tests','deploy','trouble'];
+const navItems=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur2='hero';
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&window.scrollY>=el.offsetTop-200)cur2=id;
+  });
+  navItems.forEach(n=>{
+    const match=n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+cur2+"'");
+    n.classList.toggle('active',match);
+  });
+});
+
+// SCROLL TO
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth'});
+  if(window.innerWidth<800)document.getElementById('sidebar').classList.remove('open');
+}
+
+// MOBILE SIDEBAR
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+</script>
+
+
+</body></html>
