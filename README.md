@@ -1,10 +1,12 @@
+# \### 📖 \[View Interactive Docs →](https://MayankHenry.github.io/Shortcut-Learning-Detector/)
+
 # <div align="center">
 
 # 
 
 # <!-- ANIMATED BANNER -->
 
-# <img width="100%" src="https://capsule-render.vercel.app/api?type=waving\&color=0:00e5ff,50:0066ff,100:00e5a0\&height=200\&section=header\&text=Shortcut%20Learning%20Detector\&fontSize=42\&fontColor=ffffff\&fontAlignY=38\&desc=GLA%20University%20%C2%B7%20Project%2045%20%C2%B7%20Team%2085\&descAlignY=58\&descSize=16\&animation=fadeIn"/>
+# <img width="100%" src="https://capsule-render.vercel.app/api?type=waving\\\&color=0:00e5ff,50:0066ff,100:00e5a0\\\&height=200\\\&section=header\\\&text=Shortcut%20Learning%20Detector\\\&fontSize=42\\\&fontColor=ffffff\\\&fontAlignY=38\\\&desc=GLA%20University%20%C2%B7%20Project%2045%20%C2%B7%20Team%2085\\\&descAlignY=58\\\&descSize=16\\\&animation=fadeIn"/>
 
 # 
 
@@ -14,7 +16,7 @@
 
 # &#x20; <a href="https://shortcut-learning-detector.vercel.app/">
 
-# &#x20;   <img src="https://img.shields.io/badge/🌐%20Live%20Demo-Vercel-00e5ff?style=for-the-badge\&logoColor=black" alt="Live Demo"/>
+# &#x20;   <img src="https://img.shields.io/badge/🌐%20Live%20Demo-Vercel-00e5ff?style=for-the-badge\\\&logoColor=black" alt="Live Demo"/>
 
 # &#x20; </a>
 
@@ -28,11 +30,11 @@
 
 # &#x20; \&nbsp;
 
-# &#x20; <img src="https://img.shields.io/badge/Python-3.10-3776ab?style=for-the-badge\&logo=python\&logoColor=white"/>
+# &#x20; <img src="https://img.shields.io/badge/Python-3.10-3776ab?style=for-the-badge\\\&logo=python\\\&logoColor=white"/>
 
 # &#x20; \&nbsp;
 
-# &#x20; <img src="https://img.shields.io/badge/PyTorch-CPU%20Inference-ee4c2c?style=for-the-badge\&logo=pytorch\&logoColor=white"/>
+# &#x20; <img src="https://img.shields.io/badge/PyTorch-CPU%20Inference-ee4c2c?style=for-the-badge\\\&logo=pytorch\\\&logoColor=white"/>
 
 # </p>
 
@@ -42,19 +44,19 @@
 
 # <p>
 
-# &#x20; <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge\&logo=fastapi\&logoColor=white"/>
+# &#x20; <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge\\\&logo=fastapi\\\&logoColor=white"/>
 
 # &#x20; \&nbsp;
 
-# &#x20; <img src="https://img.shields.io/badge/React-18-61dafb?style=for-the-badge\&logo=react\&logoColor=black"/>
+# &#x20; <img src="https://img.shields.io/badge/React-18-61dafb?style=for-the-badge\\\&logo=react\\\&logoColor=black"/>
 
 # &#x20; \&nbsp;
 
-# &#x20; <img src="https://img.shields.io/badge/Docker-Containerized-2496ed?style=for-the-badge\&logo=docker\&logoColor=white"/>
+# &#x20; <img src="https://img.shields.io/badge/Docker-Containerized-2496ed?style=for-the-badge\\\&logo=docker\\\&logoColor=white"/>
 
 # &#x20; \&nbsp;
 
-# &#x20; <img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088ff?style=for-the-badge\&logo=githubactions\&logoColor=white"/>
+# &#x20; <img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088ff?style=for-the-badge\\\&logo=githubactions\\\&logoColor=white"/>
 
 # </p>
 
@@ -68,7 +70,7 @@
 
 # &#x20; \&nbsp;
 
-# &#x20; <img src="https://img.shields.io/badge/Tests-Passing-00e5a0?style=for-the-badge\&logo=pytest\&logoColor=white"/>
+# &#x20; <img src="https://img.shields.io/badge/Tests-Passing-00e5a0?style=for-the-badge\\\&logo=pytest\\\&logoColor=white"/>
 
 # &#x20; \&nbsp;
 
@@ -84,7 +86,7 @@
 
 # <!-- HERO DESCRIPTION -->
 
-# > \*\*An end-to-end deep learning diagnostic system\*\* that exposes and mitigates \*Shortcut Learning\* in CNNs.  
+# > \*\*An end-to-end deep learning diagnostic system\*\* that exposes and mitigates \*Shortcut Learning\* in CNNs.
 
 # > Compare a Biased vs. Unbiased PyTorch model with real-time \*\*Grad-CAM heatmap visualization.\*\*
 
@@ -142,7 +144,7 @@
 
 # <div align="center">
 
-# <img src="https://readme-typing-svg.demolab.com?font=Fira+Code\&size=16\&duration=3000\&pause=1000\&color=00E5FF\&center=true\&vCenter=true\&width=600\&lines=CNNs+learn+color+shortcuts+instead+of+shapes...;Our+system+detects+%26+fixes+this+problem!;Compare+Biased+vs+Unbiased+models+live!" alt="Typing SVG" />
+# <img src="https://readme-typing-svg.demolab.com?font=Fira+Code\\\&size=16\\\&duration=3000\\\&pause=1000\\\&color=00E5FF\\\&center=true\\\&vCenter=true\\\&width=600\\\&lines=CNNs+learn+color+shortcuts+instead+of+shapes...;Our+system+detects+%26+fixes+this+problem!;Compare+Biased+vs+Unbiased+models+live!" alt="Typing SVG" />
 
 # </div>
 
@@ -630,13 +632,13 @@
 
 # |:---|:---|:---:|
 
-# | `test\_health` | Core API routes respond | `200 OK` |
+# | `test\\\_health` | Core API routes respond | `200 OK` |
 
-# | `test\_docs` | Swagger UI accessible | `200 OK` |
+# | `test\\\_docs` | Swagger UI accessible | `200 OK` |
 
-# | `test\_404` | Invalid routes handled | `404 Not Found` |
+# | `test\\\_404` | Invalid routes handled | `404 Not Found` |
 
-# | `test\_model\_load` | `.pth` files loadable | No exception |
+# | `test\\\_model\\\_load` | `.pth` files loadable | No exception |
 
 # 
 
@@ -650,7 +652,7 @@
 
 # <details>
 
-# <summary><b>❌ FileNotFoundError on startup</b></summary>
+# <summary>**❌ FileNotFoundError on startup**</summary>
 
 # 
 
@@ -672,7 +674,7 @@
 
 # <details>
 
-# <summary><b>❌ ERR\_CONNECTION\_REFUSED on image upload</b></summary>
+# <summary>**❌ ERR\_CONNECTION\_REFUSED on image upload**</summary>
 
 # 
 
@@ -680,7 +682,7 @@
 
 # 1\. FastAPI server is running: `uvicorn main:app --reload --port 8000`
 
-# 2\. `frontend/.env` has: `REACT\_APP\_API\_URL=http://localhost:8000`
+# 2\. `frontend/.env` has: `REACT\\\_APP\\\_API\\\_URL=http://localhost:8000`
 
 # </details>
 
@@ -688,7 +690,7 @@
 
 # <details>
 
-# <summary><b>❌ CUDA Error on model load</b></summary>
+# <summary>**❌ CUDA Error on model load**</summary>
 
 # 
 
@@ -708,7 +710,7 @@
 
 # <details>
 
-# <summary><b>❌ Cloudinary / Redis not connecting</b></summary>
+# <summary>**❌ Cloudinary / Redis not connecting**</summary>
 
 # 
 
@@ -834,7 +836,7 @@
 
 # \- Every `git push` to `main` → tests run → Vercel \& Render auto-deploy
 
-# \- Frontend env var `REACT\_APP\_API\_URL` is set in Vercel dashboard (never hardcoded)
+# \- Frontend env var `REACT\\\_APP\\\_API\\\_URL` is set in Vercel dashboard (never hardcoded)
 
 # 
 
@@ -878,7 +880,7 @@
 
 # 
 
-# <img width="100%" src="https://capsule-render.vercel.app/api?type=waving\&color=0:00e5a0,50:0066ff,100:00e5ff\&height=120\&section=footer\&animation=fadeIn"/>
+# <img width="100%" src="https://capsule-render.vercel.app/api?type=waving\\\&color=0:00e5a0,50:0066ff,100:00e5ff\\\&height=120\\\&section=footer\\\&animation=fadeIn"/>
 
 # 
 
