@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0043)file:///C:/Users/naiti/Downloads/index.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Shortcut Learning Detector · Interactive Docs</title>
-<link href="./index2_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --bg:#03040a;--s1:#07090f;--s2:#0b0e19;--s3:#101424;
@@ -355,13 +355,13 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </head>
 <body>
 
-<div id="cur" style="left: 940px; top: 179px;"></div>
-<div id="ring" style="left: 915.66px; top: 187.675px;"></div>
+<div id="cur"></div>
+<div id="ring"></div>
 <div class="grid-bg"></div>
 <div class="glow-1"></div>
 <div class="glow-2"></div>
 <div class="scan"></div>
-<div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%;"></div></div>
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
 
 <!-- MOBILE TOGGLE -->
 <button class="mob-toggle" id="mob-toggle" onclick="toggleSidebar()">☰</button>
@@ -374,25 +374,25 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
   <div class="sidebar-nav">
     <div class="nav-group-label">Introduction</div>
-    <a class="nav-item active" onclick="scrollTo(&#39;hero&#39;)"><span class="ni">🏠</span> Overview</a>
-    <a class="nav-item" onclick="scrollTo(&#39;problem&#39;)"><span class="ni">🧠</span> The Problem</a>
-    <a class="nav-item" onclick="scrollTo(&#39;models&#39;)"><span class="ni">⚔️</span> Two Models</a>
+    <a class="nav-item active" onclick="scrollTo('hero')"><span class="ni">🏠</span> Overview</a>
+    <a class="nav-item" onclick="scrollTo('problem')"><span class="ni">🧠</span> The Problem</a>
+    <a class="nav-item" onclick="scrollTo('models')"><span class="ni">⚔️</span> Two Models</a>
 
     <div class="nav-group-label">Technical</div>
-    <a class="nav-item" onclick="scrollTo(&#39;stack&#39;)"><span class="ni">🛠️</span> Tech Stack</a>
-    <a class="nav-item" onclick="scrollTo(&#39;arch&#39;)"><span class="ni">🏗️</span> Architecture</a>
-    <a class="nav-item" onclick="scrollTo(&#39;data&#39;)"><span class="ni">🗄️</span> Data Storage</a>
+    <a class="nav-item" onclick="scrollTo('stack')"><span class="ni">🛠️</span> Tech Stack</a>
+    <a class="nav-item" onclick="scrollTo('arch')"><span class="ni">🏗️</span> Architecture</a>
+    <a class="nav-item" onclick="scrollTo('data')"><span class="ni">🗄️</span> Data Storage</a>
 
     <div class="nav-group-label">Getting Started</div>
-    <a class="nav-item" onclick="scrollTo(&#39;setup&#39;)"><span class="ni">🚀</span> Local Setup</a>
-    <a class="nav-item" onclick="scrollTo(&#39;envvars&#39;)"><span class="ni">🔑</span> Env Variables</a>
-    <a class="nav-item" onclick="scrollTo(&#39;trap&#39;)"><span class="ni">🪤</span> Test the Trap</a>
+    <a class="nav-item" onclick="scrollTo('setup')"><span class="ni">🚀</span> Local Setup</a>
+    <a class="nav-item" onclick="scrollTo('envvars')"><span class="ni">🔑</span> Env Variables</a>
+    <a class="nav-item" onclick="scrollTo('trap')"><span class="ni">🪤</span> Test the Trap</a>
 
     <div class="nav-group-label">DevOps</div>
-    <a class="nav-item" onclick="scrollTo(&#39;cicd&#39;)"><span class="ni">🔄</span> CI / CD</a>
-    <a class="nav-item" onclick="scrollTo(&#39;tests&#39;)"><span class="ni">✅</span> Test Coverage</a>
-    <a class="nav-item" onclick="scrollTo(&#39;deploy&#39;)"><span class="ni">☁️</span> Deployment</a>
-    <a class="nav-item" onclick="scrollTo(&#39;trouble&#39;)"><span class="ni">🔧</span> Troubleshoot</a>
+    <a class="nav-item" onclick="scrollTo('cicd')"><span class="ni">🔄</span> CI / CD</a>
+    <a class="nav-item" onclick="scrollTo('tests')"><span class="ni">✅</span> Test Coverage</a>
+    <a class="nav-item" onclick="scrollTo('deploy')"><span class="ni">☁️</span> Deployment</a>
+    <a class="nav-item" onclick="scrollTo('trouble')"><span class="ni">🔧</span> Troubleshoot</a>
   </div>
   <div class="sidebar-footer">
     <div><span class="live-dot"></span>Live on Vercel + Render</div>
@@ -432,7 +432,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </section>
 
 <!-- ══════ PROBLEM ══════ -->
-<section class="section rv on" id="problem">
+<section class="section rv" id="problem">
   <div class="sec-eyebrow">Core Concept</div>
   <h2 class="sec-title">The <span class="ac">Problem</span></h2>
   <div class="card">
@@ -454,7 +454,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </section>
 
 <!-- ══════ MODELS ══════ -->
-<section class="section rv on" id="models">
+<section class="section rv" id="models">
   <div class="sec-eyebrow">The Experiment</div>
   <h2 class="sec-title">Two <span class="ac">Models</span></h2>
   <div class="model-row">
@@ -492,7 +492,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </section>
 
 <!-- ══════ TECH STACK ══════ -->
-<section class="section rv on" id="stack">
+<section class="section rv" id="stack">
   <div class="sec-eyebrow">Technologies</div>
   <h2 class="sec-title">Full <span class="ac">Tech Stack</span></h2>
   <div class="card">
@@ -518,7 +518,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </section>
 
 <!-- ══════ ARCHITECTURE ══════ -->
-<section class="section rv on" id="arch">
+<section class="section rv" id="arch">
   <div class="sec-eyebrow">System Design</div>
   <h2 class="sec-title">System <span class="ac">Architecture</span></h2>
   <div class="arch">
@@ -531,7 +531,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <span class="h">│              FastAPI BACKEND (Render)                │</span>
 │                                                     │
 │  <span class="g">┌───────────┐</span>   <span class="o">┌──────────────┐</span>   <span class="y">┌───────────┐</span>  │
-│  <span class="g">│  PyTorch  │</span>──▶<span class="o">│ OpenCV       │</span>   <span class="y">│ Weights &amp; │</span>  │
+│  <span class="g">│  PyTorch  │</span>──▶<span class="o">│ OpenCV       │</span>   <span class="y">│ Weights & │</span>  │
 │  <span class="g">│ Inference │</span>   <span class="o">│ Grad-CAM     │</span>   <span class="y">│ Biases    │</span>  │
 │  <span class="g">└───────────┘</span>   <span class="o">└──────┬───────┘</span>   <span class="y">└───────────┘</span>  │
 │                         │                           │
@@ -544,7 +544,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </section>
 
 <!-- ══════ DATA ══════ -->
-<section class="section rv on" id="data">
+<section class="section rv" id="data">
   <div class="sec-eyebrow">Storage Strategy</div>
   <h2 class="sec-title">Data <span class="ac">Architecture</span></h2>
   <div class="card">
@@ -564,7 +564,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </section>
 
 <!-- ══════ SETUP ══════ -->
-<section class="section rv on" id="setup">
+<section class="section rv" id="setup">
   <div class="sec-eyebrow">Getting Started</div>
   <h2 class="sec-title">Local <span class="ac">Setup</span></h2>
   <p style="color:var(--muted2);font-size:.88rem;margin-bottom:24px">Windows PowerShell · Requires Python 3.10+ and Node.js</p>
@@ -575,7 +575,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="step"><div class="sn"></div><div class="sb"><h4>Install Dependencies</h4><pre>pip install --upgrade pip
 pip install -r backend/requirements.txt</pre></div></div>
       <div class="step"><div class="sn"></div><div class="sb">
-        <h4>Generate Model Weights &nbsp;<span style="color:var(--red);font-family:&#39;JetBrains Mono&#39;,monospace;font-size:.7rem">CRITICAL</span></h4>
+        <h4>Generate Model Weights &nbsp;<span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.7rem">CRITICAL</span></h4>
         <p>Downloads MNIST, applies color transforms, trains both CNNs, saves <code>.pth</code> files. Skipping causes <code>FileNotFoundError</code>.</p>
         <pre>cd backend
 python train_biased_model.py
@@ -589,7 +589,7 @@ npm install &amp;&amp; npm start</pre><p>Runs at <code>http://localhost:3000</co
 </section>
 
 <!-- ══════ ENV VARS ══════ -->
-<section class="section rv on" id="envvars">
+<section class="section rv" id="envvars">
   <div class="sec-eyebrow">Configuration</div>
   <h2 class="sec-title">Environment <span class="ac">Variables</span></h2>
   <div class="card" style="margin-bottom:14px">
@@ -602,7 +602,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 <span class="cm"># Redis — In-memory caching</span>
 REDIS_URL=redis://your_redis_url:port
 
-<span class="cm"># Weights &amp; Biases — MLOps tracking</span>
+<span class="cm"># Weights & Biases — MLOps tracking</span>
 WANDB_API_KEY=your_wandb_api_key</pre>
   </div>
   <div class="card">
@@ -614,7 +614,7 @@ REACT_APP_API_URL=http://localhost:8000</pre>
 </section>
 
 <!-- ══════ TRAP ══════ -->
-<section class="section rv on" id="trap">
+<section class="section rv" id="trap">
   <div class="sec-eyebrow">Demonstration</div>
   <h2 class="sec-title">Test the <span class="ac">Shortcut Trap</span></h2>
   <p style="color:var(--muted2);font-size:.88rem;margin-bottom:22px">Trigger a live misclassification and watch Grad-CAM reveal what the biased model is actually "seeing."</p>
@@ -635,7 +635,7 @@ REACT_APP_API_URL=http://localhost:8000</pre>
 </section>
 
 <!-- ══════ CI/CD ══════ -->
-<section class="section rv on" id="cicd">
+<section class="section rv" id="cicd">
   <div class="sec-eyebrow">DevOps</div>
   <h2 class="sec-title">CI / CD <span class="ac">Pipeline</span></h2>
   <p style="color:var(--muted2);font-size:.88rem;margin-bottom:22px">Every <code>push</code> or <code>pull_request</code> to <code>main</code> triggers GitHub Actions.</p>
@@ -657,7 +657,7 @@ REACT_APP_API_URL=http://localhost:8000</pre>
 </section>
 
 <!-- ══════ TESTS ══════ -->
-<section class="section rv on" id="tests">
+<section class="section rv" id="tests">
   <div class="sec-eyebrow">Quality Assurance</div>
   <h2 class="sec-title">Test <span class="ac">Coverage</span></h2>
   <div class="card" style="margin-bottom:14px"><p class="cb" style="margin-bottom:12px">PyTest + HTTPX simulates full API cycles without a live server.</p><pre>pytest test_main.py -v</pre></div>
@@ -670,7 +670,7 @@ REACT_APP_API_URL=http://localhost:8000</pre>
 </section>
 
 <!-- ══════ DEPLOY ══════ -->
-<section class="section rv on" id="deploy">
+<section class="section rv" id="deploy">
   <div class="sec-eyebrow">Production</div>
   <h2 class="sec-title">Live <span class="ac">Deployment</span></h2>
   <div class="card">
@@ -679,7 +679,7 @@ REACT_APP_API_URL=http://localhost:8000</pre>
         <thead><tr><th>Component</th><th>Platform</th><th>URL</th></tr></thead>
         <tbody>
           <tr><td><strong>Frontend</strong></td><td><span class="pill pc">Vercel</span></td><td><a href="https://shortcut-learning-detector.vercel.app/" style="color:var(--cyan);font-size:.8rem">shortcut-learning-detector.vercel.app</a></td></tr>
-          <tr><td><strong>Backend API</strong></td><td><span class="pill pg">Render</span></td><td><a href="https://shortcut-learning-detector-pgcc.onrender.com/" style="color:var(--cyan);font-size:.8rem">shortcut-learning-detector-pgcc.onrender.com</a></td></tr>
+          <tr><td><strong>Backend API</strong></td><td><span class="pill pg">Render</span></td><td><a href="https://shortcut-learning-detector-pgcc.onrender.com" style="color:var(--cyan);font-size:.8rem">shortcut-learning-detector-pgcc.onrender.com</a></td></tr>
           <tr><td><strong>Swagger Docs</strong></td><td><span class="pill pg">Render</span></td><td><a href="https://shortcut-learning-detector-pgcc.onrender.com/docs" style="color:var(--cyan);font-size:.8rem">.../docs</a></td></tr>
         </tbody>
       </table>
@@ -688,7 +688,7 @@ REACT_APP_API_URL=http://localhost:8000</pre>
 </section>
 
 <!-- ══════ TROUBLESHOOT ══════ -->
-<section class="section rv on" id="trouble">
+<section class="section rv" id="trouble">
   <div class="sec-eyebrow">Support</div>
   <h2 class="sec-title">Common <span class="ac">Errors</span></h2>
   <div class="tr2"><div class="tq"><span class="tt">FileNotFoundError</span> Server fails to start</div><div class="ta">Skipped model training. Run both scripts: <code>python train_biased_model.py</code> and <code>python train_unbiased_model.py</code> inside <code>backend/</code>.</div></div>
@@ -757,6 +757,5 @@ function scrollTo(id){
 // MOBILE SIDEBAR
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
 </script>
-
-
-</body></html>
+</body>
+</html>
