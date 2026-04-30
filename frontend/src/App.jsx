@@ -1,6 +1,10 @@
 import { useState, useRef, useCallback } from "react";
 import "./App.css";
+<<<<<<< HEAD
 import Navbar from "./content/Navbar";
+=======
+import Navbar from "./components/Navbar";
+>>>>>>> 2700ef17902689dabdebcc80c9d628f13b8844c7
 import AdminLogs from "./pages/AdminLogs";
 import HowItWorks from "./pages/HowItWorks";
 
@@ -214,7 +218,11 @@ export default function App() {
     const reader = new FileReader();
     reader.onload = (e) => setImagePreview(e.target.result);
     reader.readAsDataURL(file);
+<<<<<<< HEAD
   }, [validateFile]);
+=======
+  }, []);
+>>>>>>> 2700ef17902689dabdebcc80c9d628f13b8844c7
 
   const handleDrop = useCallback((e) => {
     e.preventDefault();
