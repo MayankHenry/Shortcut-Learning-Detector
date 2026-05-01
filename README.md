@@ -14,7 +14,7 @@
 
 # <p>
 
-# &#x20; <a href="https://shortcut-learning-detector.vercel.app/">
+# &#x20; <a href="https://shortcut-learning-detector.vercel.app/](https://shortcut-learn-detector.netlify.app/">
 
 # &#x20;   <img src="https://img.shields.io/badge/🌐%20Live%20Demo-Vercel-00e5ff?style=for-the-badge\\\&logoColor=black" alt="Live Demo"/>
 
